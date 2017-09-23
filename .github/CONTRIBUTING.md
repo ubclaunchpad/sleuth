@@ -28,7 +28,7 @@ $ git add .
 $ git commit
 # Fill out commit description and push (set upstream if this is your first push for this new branch)
 $ git push --set-upstream origin 10-add-search
-# Keep coding, commiting, and pushing your changes
+# Keep coding, committing, and pushing your changes
 ```
 
 ## Issue Tracking
@@ -42,5 +42,3 @@ JavaScript should generally follow [ES6 Style](https://github.com/airbnb/javascr
 ### Testing
 All code changes must come with unit tests - we want to keep code coverage at or above 70%. PRs without tests will not be approved.
 We will be using [Travis CI](https://travis-ci.org/) to automatically build and run tests automatically when we push or issue PRs.
-
-

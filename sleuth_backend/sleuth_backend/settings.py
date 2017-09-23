@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
+    'haystack',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,12 @@ DATABASES = {
     }
 }
 
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr',
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
