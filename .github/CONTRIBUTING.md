@@ -36,7 +36,7 @@ All issues will be tracked using the ZenHub Chrome extension. During weekly meet
 
 ## Code Style and Best Practice
 ### Python
-Python code should all follow the [PEP8 Style](https://www.python.org/dev/peps/pep-0008/). It is recommended that you use a good text editor like [VSCode](https://code.visualstudio.com/) that will allow you to install plugins to do code linting for you.
+Python code should all follow the [PEP8 Style](https://www.python.org/dev/peps/pep-0008/). It is recommended that you use a good text editor like [VSCode](https://code.visualstudio.com/) that will allow you to install plugins to do code linting for you. We'll be using [Django Documentation](https://docs.djangoproject.com/en/1.11/ref/contrib/admin/admindocs/) for auto-generating and viewing documentation with Django.
 ### JavaScript
 JavaScript should generally follow [ES6 Style](https://github.com/airbnb/javascript). Again, using a strong editor with JS linting will be important here.
 ### Testing
