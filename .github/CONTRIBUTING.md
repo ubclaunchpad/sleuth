@@ -28,7 +28,7 @@ $ git add .
 $ git commit
 # Fill out commit description and push (set upstream if this is your first push for this new branch)
 $ git push --set-upstream origin 10-add-search
-# Keep coding, committing, and pushing your changes
+# Keep coding, committing, and pushing your changes. When you're done, create a against master.
 ```
 
 ## Issue Tracking

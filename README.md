@@ -31,6 +31,8 @@ $ docker-compose exec web bash
 root@57d91373cdca:/home/sleuth# cd sleuth_backend
 # Run migrations
 root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py migrate
+# Create Django admin user
+root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py createsuperuser
 # Start Django server
 root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py runserver 0.0.0.0:8000
 ```
