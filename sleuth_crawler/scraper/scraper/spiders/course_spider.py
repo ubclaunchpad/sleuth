@@ -6,13 +6,12 @@ class CourseSpider(scrapy.Spider):
     """
 
     name = "courses"
+    urls = [
+        "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0"
+    ]
 
     def start_requests(self):
-        urls = [
-            "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0"
-        ]
-
-        for url in urls:
+        for url in self.urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
