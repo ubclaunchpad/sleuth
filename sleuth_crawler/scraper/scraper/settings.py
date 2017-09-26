@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'courses_scraper'
+BOT_NAME = 'scraper'
 
-SPIDER_MODULES = ['courses_scraper.spiders']
-NEWSPIDER_MODULE = 'courses_scraper.spiders'
+SPIDER_MODULES = ['scraper.spiders']
+NEWSPIDER_MODULE = 'scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'courses_scraper.spiders'
 ROBOTSTXT_OBEY = True
 
 # Enable SSL Handshakes
-DOWNLOADER_CLIENTCONTEXTFACTORY = 'courses_scraper.customcontext.CustomContextFactory'
+DOWNLOADER_CLIENTCONTEXTFACTORY = 'scraper.customcontext.CustomContextFactory'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
