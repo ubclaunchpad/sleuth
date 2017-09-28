@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+
+  solr:
+    image: solr
+    ports:
+     - "8983:8983"
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - mycore
+
+  web:
+    build: .
+    command: python3 sleuth_backend/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/home/sleuth
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - solr
