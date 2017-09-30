@@ -1,4 +1,6 @@
-# Sleuth :mag_right: [![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
+# Sleuth :mag_right: 
+[![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.com)
+[![Build Status](https://travis-ci.org/ubclaunchpad/sleuth.svg?branch=master)](https://travis-ci.org/ubclaunchpad/sleuth)
 
 UBC's own search engine :rocket:
 
@@ -36,3 +38,13 @@ root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py createsuperuser
 # Start Django server
 root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py runserver 0.0.0.0:8000
 ```
+
+## Adding Test Data
+
+Once you have started your containers you can populate Solr with some test data by running
+
+```Shell
+$ bash scripts/populate.sh
+```
+
+After this script has run you check out your sample data at http://localhost:8983/solr/#/test/query
