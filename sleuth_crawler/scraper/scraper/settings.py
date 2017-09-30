@@ -67,9 +67,9 @@ DOWNLOADER_CLIENTCONTEXTFACTORY = 'scraper.customcontext.CustomContextFactory'
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'courses_scraper.pipelines.CoursesScraperPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'scraper.pipelines.JsonLogPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
