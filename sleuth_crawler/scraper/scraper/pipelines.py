@@ -20,3 +20,18 @@ class JsonLogPipeline(object):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
         return item
+
+class CourseToDjangoPipeline(object):
+    """
+    Saves course data to Django
+    """
+    def open_spider(self, spider):
+        return
+    
+    def close_spider(self, spider):
+        return
+
+    def process_item(self, item, spider):
+        return
+
+
