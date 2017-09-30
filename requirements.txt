@@ -3,3 +3,4 @@ psycopg2
 docutils
 django-haystack
 pysolr
+django-cors-headers
