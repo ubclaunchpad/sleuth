@@ -15,7 +15,7 @@ services:
 
   web:
     build: .
-    command: python3 sleuth_backend/manage.py runserver 0.0.0.0:8000
+    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/home/sleuth
     ports:
@@ -23,3 +23,14 @@ services:
     depends_on:
       - db
       - solr
+
+  frontend:
+    build: 
+      context: ../sleuth-frontend
+    command: yarn start --host 0.0.0.0 --port 8080
+    volumes:
+      - ../sleuth-frontend:/home/sleuth-frontend
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - web
