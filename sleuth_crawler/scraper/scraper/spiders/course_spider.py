@@ -1,12 +1,25 @@
 import scrapy
 import urlparse
+from scrapy_djangoitem import DjangoItem
+from sleuth_backend.models import Subject, Course # TODO: setup on Django side
+
+class SubjectItem(DjangoItem):
+    """
+    Subject model, as defined in Django
+    """
+    django_model = Subject
+
+class CourseItem(DjangoItem):
+    """
+    Course model, as defined in Django
+    """
+    django_model = Course
 
 class CourseSpider(scrapy.Spider):
     """
     Spider that crawls courses.students.ubc.ca
     For all detailed course data.
     """
-
     name = "courses"
     urls = [
         "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0"
@@ -24,34 +37,43 @@ class CourseSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
+        """
+        Scrape for Subjects
+        """
         output = []
         rows = response.xpath('//tbody/tr')
         for row in rows:
-            data = {}
-            url = self.base_url + row.xpath('./td/a/@href').extract_first()
-            data['subject_code'] = row.xpath('./td/a/text()').extract_first()
+            subject = SubjectItem()
+            next_url = self.base_url + row.xpath('./td/a/@href').extract_first()
+
+            subject['subject_code'] = row.xpath('./td/a/text()').extract_first()
             title = row.xpath('./td[2]/text()').extract_first()
-            data['subject_title'] = title.rstrip()
-            # doesn't always have 2nd column in child links
-            data['faculty'] = row.xpath('./td[3]/text()').extract_first()
+            subject['subject_title'] = title.rstrip()
+            subject['faculty'] = row.xpath('./td[3]/text()').extract_first()
+            
             yield scrapy.Request(
-                url,
+                next_url,
                 callback = self.parse_courses,
-                meta = {'data' : data}
+                meta = {'data' : subject}
             )
 
     def parse_courses(self, response):
-        data = response.meta['data']
+        """
+        Scrape for Courses, each associated with a Subject
+        """
+        subject = response.meta['data']
         rows = response.xpath('//tbody/tr')
         courses = []
         for row in rows:
-            rowdata = {}
-            url = row.xpath('./td/a/@href').extract_first()
-            rowdata['course'] = row.xpath('./td/a/text()').extract_first()
-            rowdata['title'] = row.xpath('./td[2]/text()').extract_first()
-            courses.append(rowdata)
-        data['courses'] = courses
-        yield data
+            course = CourseItem()
+            next_url = row.xpath('./td/a/@href').extract_first()
+
+            course['subject'] = subject
+            course['code'] = row.xpath('./td/a/text()').extract_first()
+            course['title'] = row.xpath('./td[2]/text()').extract_first()
+            # course['prereqs'] = 
+            courses.append(course)
+        yield {subject, courses}
         """
         yield scrapy.Request(
             urlparse.urljoin(self.base_url, data['url']), 
@@ -60,7 +82,7 @@ class CourseSpider(scrapy.Spider):
         )
         """
 
-"""
+    """
     def parse_sections(self, response):
         data = response.meta['data']
         rows = response.xpath('//tbody/tr')
@@ -74,6 +96,6 @@ class CourseSpider(scrapy.Spider):
             sections.append(rowdata)
         data['sections'] = sections
         yield data
-"""
+    """
 
     #def parse_section(self, response):
