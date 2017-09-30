@@ -1,19 +1,5 @@
 import scrapy
 import urlparse
-from scrapy_djangoitem import DjangoItem
-from sleuth_backend.models import Subject, Course # TODO: setup on Django side
-
-class SubjectItem(DjangoItem):
-    """
-    Subject model, as defined in Django
-    """
-    django_model = Subject
-
-class CourseItem(DjangoItem):
-    """
-    Course model, as defined in Django
-    """
-    django_model = Course
 
 class CourseSpider(scrapy.Spider):
     """
@@ -43,7 +29,7 @@ class CourseSpider(scrapy.Spider):
         output = []
         rows = response.xpath('//tbody/tr')
         for row in rows:
-            subject = SubjectItem()
+            subject = {}
             next_url = self.base_url + row.xpath('./td/a/@href').extract_first()
 
             subject['subject_code'] = row.xpath('./td/a/text()').extract_first()
@@ -65,37 +51,10 @@ class CourseSpider(scrapy.Spider):
         rows = response.xpath('//tbody/tr')
         courses = []
         for row in rows:
-            course = CourseItem()
+            course = {}
             next_url = row.xpath('./td/a/@href').extract_first()
-
-            course['subject'] = subject
             course['code'] = row.xpath('./td/a/text()').extract_first()
             course['title'] = row.xpath('./td[2]/text()').extract_first()
             # course['prereqs'] = 
             courses.append(course)
         yield {subject, courses}
-        """
-        yield scrapy.Request(
-            urlparse.urljoin(self.base_url, data['url']), 
-            callback=self.parse_sections,
-            meta={'data': data}
-        )
-        """
-
-    """
-    def parse_sections(self, response):
-        data = response.meta['data']
-        rows = response.xpath('//tbody/tr')
-        sections = []
-        for row in rows:
-            rowdata = {}
-            url = row.xpath('./td/a/@href').extract_first()
-            rowdata['section'] = row.xpath('./td/a/text()').extract_first()
-            rowdata['status'] = row.xpath('./td[0]/text()').extract_first()
-            rowdata['type'] = row.xpath('./td[2]/text()').extract_first()
-            sections.append(rowdata)
-        data['sections'] = sections
-        yield data
-    """
-
-    #def parse_section(self, response):
