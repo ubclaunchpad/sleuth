@@ -15,7 +15,7 @@ services:
 
   web:
     build: .
-    command: python3 sleuth_backend/manage.py runserver 0.0.0.0:8000
+    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/home/sleuth
     ports:
