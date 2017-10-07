@@ -39,12 +39,25 @@ root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py createsuperuser
 root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py runserver 0.0.0.0:8000
 ```
 
+### Accessing Solr
+
+- To access your Solr admin interface, go to http://localhost:8983/solr.
+- To query a core with the name "test", go to http://localhost:8983/solr/#/test/query.
+
+### Accessing Django
+
+- The base url for your Django instance should be http://localhost:8000. 
+- To access the Django admin interface make sure you have completed the steps listed above and to go http://localhost:8000/admin.
+
+### Accessing the Sleuth Front-end App
+
+- Go to http://localhost:8080
+
+
 ## Adding Test Data
 
-Once you have started your containers you can populate Solr with some test data by running
+Once you have started your containers you can populate the "test" core in Solr with some test data by running
 
 ```Shell
 $ bash scripts/populate.sh
 ```
-
-After this script has run you check out your sample data at http://localhost:8983/solr/#/test/query
