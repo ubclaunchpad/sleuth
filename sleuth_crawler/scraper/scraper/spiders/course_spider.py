@@ -1,5 +1,4 @@
 import scrapy
-import urlparse
 
 class CourseSpider(scrapy.Spider):
     """
