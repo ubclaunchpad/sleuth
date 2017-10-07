@@ -9,6 +9,12 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
+import sys
+import os.path
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+sys.path = sys.path + [os.path.join(PROJECT_ROOT, '../../..'), os.path.join(PROJECT_ROOT, '../..')]
+
 BOT_NAME = 'scraper'
 
 SPIDER_MODULES = ['scraper.spiders']

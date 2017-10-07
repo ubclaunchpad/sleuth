@@ -5,8 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
-from scraper.items import GenericPage
 from sleuth_backend.solr_module.solr_module import add_item
+from scraper.items import GenericPage
 
 class JsonLogPipeline(object):
     """
@@ -36,8 +36,8 @@ class SolrPipeline(object):
 
     def __process_generic_page__(self, item):
         solr_item = {}
-        solr_item["url"] = item["url"]
-        solr_item["page_data"] = item[""]
+        solr_item["id"] = item["url"]
+        solr_item["data"] = item["page_data"]
         return solr_item
 
 
