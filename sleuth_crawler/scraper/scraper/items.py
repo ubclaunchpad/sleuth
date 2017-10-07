@@ -7,6 +7,12 @@
 
 import scrapy
 
+class GenericPage(scrapy.Item):
+    """
+    Stores generic page data and url
+    """
+    url = scrapy.Field()
+    page_data = scrapy.Field()
 
 class ScraperItem(scrapy.Item):
     # define the fields for your item here like:

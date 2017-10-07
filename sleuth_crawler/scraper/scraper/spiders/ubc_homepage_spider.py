@@ -2,7 +2,7 @@ import scrapy
 import re
 from scrapy.contrib.spiders import Rule, CrawlSpider
 from scrapy.linkextractors import LinkExtractor
-from scraper.spiders.items import GenericPage
+from scraper.items import GenericPage
 
 class UbcBroadCrawler(CrawlSpider):
     """
@@ -21,6 +21,12 @@ class UbcBroadCrawler(CrawlSpider):
             callback='parse_item'
         ),
     )
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'scraper.pipelines.SolrPipeline': 400,
+            'scraper.pipelines.JsonLogPipeline': 300,
+        }
+    }
 
     def parse_item(self, response):
         """

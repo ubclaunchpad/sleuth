@@ -5,6 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
+from scraper.items import GenericPage
+from sleuth_backend.solr_module.solr_module import add_item
 
 class JsonLogPipeline(object):
     """
@@ -20,6 +22,24 @@ class JsonLogPipeline(object):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
         return item
+
+class SolrPipeline(object):
+    """
+    Process item and store in Solr
+    """
+    def process_item(self, item, spider):
+        if isinstance(item, GenericPage):
+            solr_item = self.__process_generic_page__(item)
+            add_item(solr_item)
+
+        return item
+
+    def __process_generic_page__(self, item):
+        solr_item = {}
+        solr_item["url"] = item["url"]
+        solr_item["page_data"] = item[""]
+        return solr_item
+
 
 class CourseToDjangoPipeline(object):
     """
