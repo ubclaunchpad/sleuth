@@ -1,17 +1,15 @@
+sudo: required
+
 language: python
 
 python:
   - 3.6
 
 services: 
-  - postgresql
+  - docker
 
 install:
-  - pip install -r requirements.txt
-
-before_script:
-  - psql -c "CREATE DATABASE testdb;" -U postgres
+  - docker-compose up
 
 script:
-  - python manage.py test sleuth_backend.tests
-  - python manage.py test sleuth_crawler.tests
+  - docker-compose exec web "python manage.py test sleuth_backend.tests && python manage.py test sleuth_crawler.tests"
