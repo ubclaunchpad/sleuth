@@ -7,10 +7,15 @@ python:
 
 services: 
   - docker
+  - postgres
 
 install:
-  - git clone https://github.com/ubclaunchpad/sleuth-frontend.git ../sleuth-frontend
-  - docker-compose build
+  - docker-compose up solr
+  - pip install -r requirements.txt
+  - bash scripts/wait.sh "curl solr:8983/solr"
+
+before_script:
+  - psql -c 'create database testdb;' -U postgres
 
 script:
-  - docker-compose run web "bash scripts/startup.sh && python manage.py test sleuth_backend.tests && python manage.py test sleuth_crawler.tests"
+  - python manage.py test

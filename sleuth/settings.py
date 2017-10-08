@@ -99,12 +99,20 @@ else:
         }
     }
 
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://solr:8983/solr',
-    },
-}
+if 'TRAVIS' in os.environ:
+    HAYSTACK_CONNECTIONS = {
+        'default': {
+            'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+            'URL': 'http://localhost:8983/solr',
+        },
+    }
+else:
+    HAYSTACK_CONNECTIONS = {
+        'default': {
+            'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+            'URL': 'http://solr:8983/solr',
+        },
+    }
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',

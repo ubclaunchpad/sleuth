@@ -17,7 +17,7 @@ services:
     environment: 
      - PYTHONUNBUFFERED=1
     build: .
-    command: bash scripts/startup.sh && python manage.py runserver 0.0.0.0:8000
+    command: bash scripts/start.sh
     volumes:
       - .:/home/sleuth
     ports:
