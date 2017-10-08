@@ -4,9 +4,6 @@ This document outlines key considerations for anyone contributing to the Sleuth 
 ## Repository Structure
 Source code will be organized into three main folders within the Sleuth repository:
 
-### sleuth_frontend
-This is where all the client-side code will live. File and directory structure under this folder will be governed by React conventions.
-
 ### sleuth_backend
 This is where all the server-side code will live. File and direcotry structure under this folder will be largely governed by Django conventions.
 

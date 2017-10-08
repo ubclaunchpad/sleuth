@@ -1,6 +1,6 @@
 import pysolr
 import json
-from sleuth_backend.settings import HAYSTACK_CONNECTIONS
+from sleuth.settings import HAYSTACK_CONNECTIONS
 
 # Begin config
 

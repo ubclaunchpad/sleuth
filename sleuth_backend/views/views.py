@@ -2,8 +2,8 @@ import pysolr
 import re
 import json
 from django.http import HttpResponse
-from solr import solr, error
-from sleuth_backend.settings import HAYSTACK_CONNECTIONS
+from . import error
+from sleuth_backend.solr import solr
 
 def cores(request):
     '''

@@ -25,18 +25,12 @@ Getting Started: [Docker](https://docs.docker.com/get-started/),
 $ docker-compose up
 ```
 
-- Once containers have started you can `exec` into `bash` in your `web` container and configure a Django admin user, or run migrations.
+- Once containers have started you can `exec` into `bash` in your `web` container and configure a Django admin user.
 
 ```Shell
 $ docker-compose exec web bash
-# Now you should be in the web container, cd into sleuth_backend
-root@57d91373cdca:/home/sleuth# cd sleuth_backend
-# Run migrations
-root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py migrate
 # Create Django admin user
-root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py createsuperuser
-# Start Django server
-root@57d91373cdca:/home/sleuth/sleuth_backend# python3 manage.py runserver 0.0.0.0:8000
+root@57d91373cdca:/home/sleuth# python3 manage.py createsuperuser
 ```
 
 ### Accessing Solr

@@ -11,11 +11,13 @@ services:
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
-      - mycore
+      - test
 
   web:
+    environment: 
+     - PYTHONUNBUFFERED=1
     build: .
-    command: python3 sleuth_backend/manage.py runserver 0.0.0.0:8000
+    command: bash scripts/startup.sh
     volumes:
       - .:/home/sleuth
     ports:

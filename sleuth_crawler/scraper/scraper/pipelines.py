@@ -6,7 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 from sleuth_backend.solr.solr import add_item
-from scraper.items import GenericPage
+from .items import GenericPage
 
 class JsonLogPipeline(object):
     """
