@@ -10,7 +10,7 @@ services:
 
 install:
   - git clone https://github.com/ubclaunchpad/sleuth-frontend.git ../sleuth-frontend
-  - docker-compose up
+  - docker-compose build
 
 script:
-  - docker-compose exec web "python manage.py test sleuth_backend.tests && python manage.py test sleuth_crawler.tests"
+  - docker-compose run web "bash scripts/startup.sh && python manage.py test sleuth_backend.tests && python manage.py test sleuth_crawler.tests"
