@@ -9,4 +9,5 @@ RUN pip install -r requirements.txt
 # Copy the contents of the current working directory to the container
 COPY . .
 # Install Postgres client to check when the DB is ready for use
-RUN apt-get update && apt-get install -f -y postgresql-client
+RUN apt-get update
+RUN apt-get install -f -y postgresql-client

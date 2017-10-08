@@ -22,4 +22,3 @@ done
 >&2 echo "Postgres ready"
 
 $migrate && $run_server
->&2 echo "ALL SERVICES ARE READY!"
