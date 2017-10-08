@@ -9,6 +9,7 @@ services:
   - docker
 
 install:
+  - git clone https://github.com/ubclaunchpad/sleuth-frontend.git ../sleuth-frontend
   - docker-compose up
 
 script:
