@@ -10,9 +10,10 @@ services:
   - postgres
 
 install:
-  - docker-compose up solr
+  - git clone https://github.com/ubclaunchpad/sleuth-frontend.git ../sleuth-frontend
+  - docker-compose up -d solr
   - pip install -r requirements.txt
-  - bash scripts/wait.sh "curl solr:8983/solr"
+  - bash scripts/wait.sh "curl localhost:8983/solr"
 
 before_script:
   - psql -c 'create database testdb;' -U postgres
