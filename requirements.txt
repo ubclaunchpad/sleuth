@@ -4,3 +4,6 @@ docutils
 django-haystack
 pysolr
 django-cors-headers
+django-nose
+coverage
+coveralls
