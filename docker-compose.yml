@@ -29,7 +29,7 @@ services:
   frontend:
     build: 
       context: ../sleuth-frontend
-    command: yarn start --host 0.0.0.0 --port 8080
+    command: sh -c "yarn && yarn start --host 0.0.0.0 --port 8080"
     volumes:
       - ../sleuth-frontend:/home/sleuth-frontend
     ports: 
