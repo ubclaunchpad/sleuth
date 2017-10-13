@@ -2,7 +2,7 @@ import scrapy
 import re
 from scrapy.contrib.spiders import Rule, CrawlSpider
 from scrapy.linkextractors import LinkExtractor
-from scraper.items import GenericPage
+from sleuth_crawler.scraper.scraper.items import GenericPage
 
 class UbcBroadCrawler(CrawlSpider):
     """
