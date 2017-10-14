@@ -1,6 +1,6 @@
 import scrapy
 import re
-from scrapy.contrib.spiders import Rule, CrawlSpider
+from scrapy.spiders import Rule, CrawlSpider
 from scrapy.linkextractors import LinkExtractor
 from sleuth_crawler.scraper.scraper.items import GenericPage
 
@@ -34,5 +34,6 @@ class UbcBroadCrawler(CrawlSpider):
         """
         output = GenericPage()
         output['url'] = response.url
-        output['page_data'] = re.sub(r'<[^>]*?>', '', str(response.body))
+        # TODO: improve garbage removal
+        output['raw_content'] = re.sub(r'<[^>]*?>', '', str(response.body))
         return output

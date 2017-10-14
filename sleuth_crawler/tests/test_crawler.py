@@ -18,4 +18,4 @@ class TestUbcBroadCralwer(TestCase):
         item = self.spider.parse_item(response)
         item = GenericPage(item)
         self.assertEqual(item['url'], "http://www.ubc.ca")
-        self.assertTrue(len(item['page_data']) > 0)
+        self.assertTrue(len(item['raw_content']) > 0)
