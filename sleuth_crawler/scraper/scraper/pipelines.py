@@ -4,9 +4,9 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import json
-from sleuth_backend.solr.solr import add_item
-from items import GenericPage
+import json, time, datetime
+import sleuth_backend.solr.solr as solr
+from sleuth_crawler.scraper.scraper.items import *
 
 class JsonLogPipeline(object):
     """
@@ -27,17 +27,49 @@ class SolrPipeline(object):
     """
     Process item and store in Solr
     """
-    def process_item(self, item, spider):
+    def process_item(self, item):
+        """
+        Match item type to predefined Schemas
+        https://github.com/ubclaunchpad/sleuth/wiki/Schemas
+        """
         if isinstance(item, GenericPage):
             solr_item = self.__process_generic_page__(item)
-            add_item(solr_item)
+            solr.add_item(solr_item, solr_item["type"])
 
         return item
 
     def __process_generic_page__(self, item):
-        solr_item = {}
-        solr_item["id"] = item["url"]
-        solr_item["data"] = item["page_data"]
+        """
+        Convert item to Generic Page
+        {
+            "id": "http://www.ubc.ca/about",
+            "type": "genericPage",
+            "siteName": "UBC",
+            "keywords": ["keyword1", "keyword2"],
+            "data": {
+                "dateUpdated": "%Y-%m-%d %H:%M:%S", // UTC timestamp
+                "pageName": "About",
+                "pageTitle": "About UBC",
+                "content": "UBC is a great place..."
+            }
+        }
+        TODO: handle currently missing datafields
+        TODO: improve "content"
+        """
+        stamp = time.time()
+        style = '%Y-%m-%d %H:%M:%S'
+        solr_item = {
+            "id": item["url"],
+            "type": "genericPage",
+            "siteName": "",
+            "keywords": [],
+            "data": {
+                "dateUpdated": datetime.datetime.fromtimestamp(stamp).strftime(style),
+                "pageName": "",
+                "pageTitle": "",
+                "content": item["raw_content"]
+            }
+        }
         return solr_item
 
 
