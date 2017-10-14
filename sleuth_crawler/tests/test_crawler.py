@@ -14,7 +14,7 @@ class TestUbcBroadCralwer(TestCase):
         """
         Test single item parse
         """
-        response = mock_response('/test_data/ubc.html', 'http://www.ubc.ca')
+        response = mock_response('/test_data/ubc.txt', 'http://www.ubc.ca')
         item = self.spider.parse_item(response)
         item = GenericPage(item)
         self.assertEqual(item['url'], "http://www.ubc.ca")
