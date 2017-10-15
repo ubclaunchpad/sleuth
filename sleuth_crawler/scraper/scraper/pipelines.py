@@ -5,7 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json, time, datetime
-import sleuth_backend.solr.solr as solr
+from sleuth_backend.views.views import SOLR
+from sleuth_backend.solr.models import *
 from sleuth_crawler.scraper.scraper.items import *
 
 class JsonLogPipeline(object):
@@ -27,50 +28,33 @@ class SolrPipeline(object):
     """
     Process item and store in Solr
     """
+    def __init__(self, solr_connection=SOLR):
+        self.solr_connection = solr_connection
+
     def process_item(self, item):
         """
         Match item type to predefined Schemas
         https://github.com/ubclaunchpad/sleuth/wiki/Schemas
         """
-        if isinstance(item, GenericPage):
-            solr_item = self.__process_generic_page__(item)
-            solr.add_item(solr_item, solr_item["type"])
+        if isinstance(item, ScrapyGenericPage):
+            solr_doc = self.__process_generic_page__(item)
+            solr_doc.save_to_solr(self.solr_connection)
 
         return item
 
     def __process_generic_page__(self, item):
         """
-        Convert item to Generic Page
-        {
-            "id": "http://www.ubc.ca/about",
-            "type": "genericPage",
-            "siteName": "UBC",
-            "keywords": ["keyword1", "keyword2"],
-            "data": {
-                "dateUpdated": "%Y-%m-%d %H:%M:%S", // UTC timestamp
-                "pageName": "About",
-                "pageTitle": "About UBC",
-                "content": "UBC is a great place..."
-            }
-        }
-        TODO: handle currently missing datafields
-        TODO: improve "content"
+        Convert Scrapy item to Solr GenericPage
         """
         stamp = time.time()
         style = '%Y-%m-%d %H:%M:%S'
-        solr_item = {
-            "id": item["url"],
-            "type": "genericPage",
-            "siteName": "",
-            "keywords": [],
-            "data": {
-                "dateUpdated": datetime.datetime.fromtimestamp(stamp).strftime(style),
-                "pageName": "",
-                "pageTitle": "",
-                "content": item["raw_content"]
-            }
-        }
-        return solr_item
+        solr_doc = GenericPage(
+            id=item["url"],
+            type="genericPage",
+            updatedAt=datetime.datetime.fromtimestamp(stamp).strftime(style),
+            content=item["raw_content"]
+        )
+        return solr_doc
 
 
 class CourseToDjangoPipeline(object):

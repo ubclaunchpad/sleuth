@@ -2,7 +2,7 @@ import scrapy
 import re
 from scrapy.spiders import Rule, CrawlSpider
 from scrapy.linkextractors import LinkExtractor
-from sleuth_crawler.scraper.scraper.items import GenericPage
+from sleuth_crawler.scraper.scraper.items import ScrapyGenericPage
 
 class UbcBroadCrawler(CrawlSpider):
     """
@@ -32,7 +32,7 @@ class UbcBroadCrawler(CrawlSpider):
         """
         Scrape page
         """
-        output = GenericPage()
+        output = ScrapyGenericPage()
         output['url'] = response.url
         # TODO: improve garbage removal
         output['raw_content'] = re.sub(r'<[^>]*?>', '', str(response.body))
