@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
+    'django_nose',
     'haystack',
     'corsheaders',
 ]
@@ -136,6 +137,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Test runners
+# https://django-testing-docs.readthedocs.io/en/latest/coverage.html#configure-django-nose
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=sleuth_backend,sleuth_crawler',
+]
+
+NOSE_IGNORE_CONFIG_FILES = True,
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
