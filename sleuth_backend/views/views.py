@@ -3,7 +3,11 @@ import re
 import json
 from django.http import HttpResponse
 from . import error
-from sleuth_backend.solr import solr
+from sleuth_backend.solr import connection as solr
+from sleuth.settings import HAYSTACK_CONNECTIONS
+
+SOLR = solr.SolrConnection(HAYSTACK_CONNECTIONS['default']['URL'])
+DEFAULT_CORE = "test"
 
 def cores(request):
     '''
@@ -12,7 +16,7 @@ def cores(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    return HttpResponse(json.dumps(solr.cores()), status=200)
+    return HttpResponse(json.dumps(SOLR.core_names()), status=200)
 
 def search(request):
     '''
@@ -33,7 +37,7 @@ def search(request):
         return HttpResponse(sleuth_error.json(), status=400)
 
     try:
-        json_data = json.dumps(solr.search(search_term))
+        json_data = json.dumps(SOLR.search(DEFAULT_CORE, search_term))
     except pysolr.SolrError as e:
         sleuth_error = error.SleuthError(str(e), error.ErrorTypes.SOLR_SEARCH_ERROR)
         return HttpResponse(sleuth_error.json(), status=400)
