@@ -2,6 +2,9 @@ import pysolr
 import json
 
 class SolrConnection(object):
+    """
+    Connection to Solr database
+    """
     
     def __init__(self, url):
         """

@@ -53,8 +53,11 @@ class GenericPage(SolrDocument):
     }
 
     def __init__(self, **kwargs):
-        super().__init__(self.doc, **kwargs)
-        self.blurb = kwargs['blurb']
+        super(GenericPage, self).__init__(self.doc, **kwargs)
+        if 'blurb' in kwargs:
+            self.blurb = kwargs['blurb'] 
+        else:
+            self.blurb = ""
 
     def output_format(self):
         return {
