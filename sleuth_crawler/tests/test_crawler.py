@@ -16,6 +16,6 @@ class TestUbcBroadCralwer(TestCase):
         """
         response = mock_response('/test_data/ubc.txt', 'http://www.ubc.ca')
         item = self.spider.parse_item(response)
-        item = GenericPage(item)
+        item = ScrapyGenericPage(item)
         self.assertEqual(item['url'], "http://www.ubc.ca")
         self.assertTrue(len(item['raw_content']) > 0)

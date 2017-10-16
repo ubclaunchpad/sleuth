@@ -7,7 +7,7 @@
 
 import scrapy
 
-class GenericPage(scrapy.Item):
+class ScrapyGenericPage(scrapy.Item):
     """
     Stores generic page data and url
     """
