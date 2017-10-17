@@ -12,6 +12,8 @@ class ScrapyGenericPage(scrapy.Item):
     Stores generic page data and url
     """
     url = scrapy.Field()
+    title = scrapy.Field()
+    description = scrapy.Field()
     raw_content = scrapy.Field()
 
 class ScraperItem(scrapy.Item):

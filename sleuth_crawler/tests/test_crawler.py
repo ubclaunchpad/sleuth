@@ -1,6 +1,6 @@
 from django.test import TestCase
 from sleuth_crawler.tests.mocks import mock_response
-from sleuth_crawler.scraper.scraper.spiders.ubc_homepage_spider import *
+from sleuth_crawler.scraper.scraper.spiders.broad_crawler import *
 
 class TestUbcBroadCralwer(TestCase):
     """
@@ -8,7 +8,7 @@ class TestUbcBroadCralwer(TestCase):
     ubc_homepage_spider.py
     """
     def setUp(self):
-        self.spider = UbcBroadCrawler()
+        self.spider = BroadCrawler()
 
     def test_parse_item(self):
         """

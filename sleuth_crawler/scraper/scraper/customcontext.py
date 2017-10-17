@@ -6,6 +6,6 @@ class CustomContextFactory(ScrapyClientContextFactory):
     Custom context factory that allows SSL negotiation.
     """
 
-    def __init__(self):
+    def __init__(self, method):
         # Use SSLv23_METHOD so we can use protocol negotiation
         self.method = SSL.SSLv23_METHOD
