@@ -12,8 +12,8 @@ class ErrorTypes(Enum):
     SOLR_CONNECTION_ERROR = 1
     # Occurs when Solr returns an error response to a search query.
     SOLR_SEARCH_ERROR = 2
-    # Occurs when a search term is missing from a search request.
-    INVALID_SEARCH_TERM = 3
+    # Occurs when a search term or core name is missing from a search request.
+    INVALID_SEARCH_REQUEST = 3
 
 class SleuthError(Exception):
     '''
@@ -21,14 +21,29 @@ class SleuthError(Exception):
     Sleuth API.
     '''
 
-    def __init__(self, message, error_type):
+    def __init__(self, error_type, message=None):
         '''
-        Takes an HTTP status code and an error message (must be one of ErrorTypes) 
+        Takes an HTTP status code and an error message (must be one of ErrorTypes)
         to return to the client and creates a SleuthError that can be converted
         to JSON.
         '''
-        self.message = message
         self.error_type = error_type
+
+        if message is not None:
+            self.message = message
+            return
+
+        if error_type is ErrorTypes.UNEXPECTED_SERVER_ERROR:
+            self.message = 'An unexpected error occurred in the Sleuth ' + \
+                'backend during the handling of your request.'
+        elif error_type is ErrorTypes.SOLR_CONNECTION_ERROR:
+            self.message = 'Failed to connect to the Solr instance'
+        elif error_type is ErrorTypes.SOLR_SEARCH_ERROR:
+            self.message = 'Solr returned an error response to the search query.'
+        elif error_type is ErrorTypes.INVALID_SEARCH_REQUEST:
+            self.message = 'Must supply a search term with the parameters "q" and "core".'
+        else:
+            raise ValueError('Invalid error type. Must be on of ErrorTypes.')
 
     def json(self):
         '''
