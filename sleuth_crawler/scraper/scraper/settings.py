@@ -23,6 +23,7 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 # List approved starting URLs to be crawled by BroadCrawler
 PARENT_URLS = [
     'http://www.ubc.ca',
+    'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0',
 ]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -46,13 +47,13 @@ CONCURRENT_REQUESTS = 100
 REACTOR_THREADPOOL_MAXSIZE = 20
 
 # Disable retrying failed HTTP requests (ie for slow websites)
-RETRY_ENABLED = False
+#RETRY_ENABLED = False
 
 # Reduce download timeout to discard stuck requests quickly
 DOWNLOAD_TIMEOUT = 15
 
 # EXPERIMENTAL: We shouldn't have to follow redirects
-REDIRECT_ENABLED = False
+#REDIRECT_ENABLED = False
 
 # EXPERIMENTAL: Ajax Crawlable Pages are rare but apparently can help
 # crawl certain web pages faster. Could have both positive and negative
@@ -65,9 +66,9 @@ COOKIES_ENABLED = False
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-   'scraper.pipelines.JsonLogPipeline': 300,
-}
+# ITEM_PIPELINES = {
+#    'scraper.pipelines.SolrPipeline': 300,
+# }
 
 ### Scrapy Defaults and Other Options:
 

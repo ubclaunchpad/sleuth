@@ -1,9 +1,8 @@
 import scrapy
+from sleuth_crawler.scraper.scraper.spiders.parsers import generic_page_parser, course_parser
 from scrapy.spiders import Rule, CrawlSpider
 from scrapy.linkextractors import LinkExtractor
 from sleuth_crawler.scraper.scraper.settings import PARENT_URLS
-from sleuth_crawler.scraper.scraper.items import ScrapyGenericPage
-from bs4 import BeautifulSoup
 
 class BroadCrawler(CrawlSpider):
     """
@@ -11,16 +10,18 @@ class BroadCrawler(CrawlSpider):
     """
     name = "broad_crawler"
 
+    GENERIC_LINK_EXTRACTOR = LinkExtractor(
+        allow=(r'ubc', r'universityofbc', ),
+        deny=(r'accounts\.google', r'intent', )
+    )
+
     start_urls = PARENT_URLS
-    allowed = ['ubc', 'universityofbc']
     rules = (
         Rule(
-            LinkExtractor(
-                allow=('ubc', 'universityofbc', ),
-                deny=('accounts\.google', 'intent', )
-            ),
+            GENERIC_LINK_EXTRACTOR,
             follow=True,
-            callback='parse_item'
+            process_request='process_req',
+            callback='parse_generic_item'
         ),
     )
     custom_settings = {
@@ -29,40 +30,31 @@ class BroadCrawler(CrawlSpider):
         }
     }
 
-    def parse_item(self, response):
+    def process_req(self, req):
         """
-        Scrape page
+        Work on requests to identify those that qualify for special treatment
         """
-        title = self.__extract_element(response.xpath("//title/text()"), 0)
-        desc = self.__extract_element(response.xpath("//meta[@name='description']/@content"), 0)
-        raw_content = self.__strip_content(response.body)
+        # Parse courses
+        course_root = "courses.students.ubc.ca"
+        if course_root in req.url:
+            if "cs/main?pname=subjarea&tname=subjareas&req=0" in req.url:
+                return req.replace(callback=self.parse_subjects)
+            else:
+                return
+        
+        return req
+        
+    """
+    Functions pointing to parser modules
+    """
+    def parse_generic_item(self, response):
+        return generic_page_parser.parse_generic_item(response, self.GENERIC_LINK_EXTRACTOR)
 
-        return ScrapyGenericPage(
-            url=response.url,
-            title=title,
-            description=desc,
-            raw_content=raw_content
-        )
+    def parse_subjects(self, response):
+        return course_parser.parse_subjects(response)
 
-    def __strip_content(self, data):
-        try:
-            # strip JavaScript, HTML
-            soup = BeautifulSoup(data, "html.parser")
-            for script in soup(["script", "style"]):
-                script.decompose()
-            data = soup.get_text()
-            # strip extraneous line breaks and sort into list
-            lines = []
-            for line in data.splitlines():
-                line = line.strip()
-                if line:
-                    lines.append(line.strip())
-            return lines
-        except Exception:
-            return None
+    def parse_subjects_helper(self, response):
+        return course_parser.parse_course_helper(response)
 
-    def __extract_element(self, list, index):
-        try:
-            return list[index].extract()
-        except IndexError:
-            return None
+    def parse_course_details(self, response):
+        return course_parser.parse_course_details(response)

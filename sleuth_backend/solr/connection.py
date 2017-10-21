@@ -72,6 +72,20 @@ class SolrConnection(object):
         
         return [self.__create_simple_document(result) for result in core.search(search_term)]
 
+    def optimize(self, core_name=None):
+        """
+        Performs defragmentation of all/specified core(s) in Solr database
+        Optionally accepts ``core_name``. Default is ``None`
+        """
+        if core_name:
+            try:
+                self.cores[core_name].optimize()
+            except KeyError as e:
+                raise KeyError('No Solr core with the name "{}" was found'.format(core_name))
+        else:
+            for core in self.core_names():
+                self.cores[core].optimize()
+
     def __create_simple_document(self, document_details):
         """TODO: improve
         Returns a dictionary of the following format using the given document

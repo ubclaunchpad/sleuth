@@ -15,8 +15,14 @@ class ScrapyGenericPage(scrapy.Item):
     title = scrapy.Field()
     description = scrapy.Field()
     raw_content = scrapy.Field()
+    children = scrapy.Field()
 
-class ScraperItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class ScrapyCourseItem(scrapy.Item):
+    """
+    Stores data about a course and associated subject
+    SubItems: ScrapySectionItem, ScrapySubjectItem
+    """
+    subject = scrapy.Field()
+    url = scrapy.Field()
+    name = scrapy.Field()
+    description = scrapy.Field()

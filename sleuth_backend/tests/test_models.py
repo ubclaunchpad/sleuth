@@ -13,7 +13,8 @@ class TestGenericPage(TestCase):
             "pageName": "testpage",
             "pageTitle": "testtitle",
             "content": "testcontent",
-            "blurb": "testblurb"
+            "description": "testblurb",
+            "children": []
         }
         return (args, GenericPage(**args))
     
@@ -21,10 +22,7 @@ class TestGenericPage(TestCase):
         args, page = self.create_page()
         
         for (key, value) in args.items():
-            if key is "blurb":
-                self.assertEqual(args["blurb"], page.blurb)
-            else:
-                self.assertEqual(value, page.doc[key])
+            self.assertEqual(value, page.doc[key])
 
     def test_output_format(self):
         args, page = self.create_page()
@@ -37,7 +35,7 @@ class TestGenericPage(TestCase):
                     "updatedAt": args["updatedAt"],
                     "pageName": args["pageName"],
                     "pageTitle": args["pageTitle"],
-                    "blurb": args["blurb"]
+                    "description": args["description"]
                 }
             },
             page.output_format()
@@ -52,5 +50,4 @@ class TestGenericPage(TestCase):
         mock = MagicMock()
         mock.insert_document.return_value = None
         page.save_to_solr(mock)
-        del args["blurb"]
         mock.insert_document.assert_called_with("genericPage", args)

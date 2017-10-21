@@ -48,6 +48,7 @@ root@57d91373cdca:/home/sleuth# python3 manage.py createsuperuser
 
 - Go to http://localhost:8080
 
+The Sleuth front-end repository is [here](https://github.com/ubclaunchpad/sleuth-frontend)
 
 ## Adding Test Data
 
@@ -55,4 +56,17 @@ Once you have started your containers you can populate the "test" core in Solr w
 
 ```Shell
 $ bash scripts/populate.sh
+```
+
+For live data, you can currently run the `BroadCrawler`, which scrapes a few thousand pages and pipelines them into the appropriate cores based on their type.
+
+```Shell
+$ bash cd sleuth_crawler/scraper && scrapy crawl broad_crawler
+```
+
+At the moment the crawler never really seems to stop, so you will likely have to force it to quit when you have sufficient data entries.
+
+To empty the a core, go to:
+```
+http://localhost:8983/solr/[CORE_NAME_HERE]/update?stream.body=<delete><query>*:*</query></delete>&commit=true
 ```
