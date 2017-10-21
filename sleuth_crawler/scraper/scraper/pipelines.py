@@ -9,21 +9,6 @@ from sleuth_backend.views.views import SOLR
 from sleuth_backend.solr.models import *
 from sleuth_crawler.scraper.scraper.items import *
 
-class JsonLogPipeline(object):
-    """
-    Log spider output to JSON file
-    """
-    def open_spider(self, spider):
-        self.file = open("log.json", "w")
-
-    def close_spider(self, spider):
-        self.file.close()
-
-    def process_item(self, item, spider):
-        line = json.dumps(dict(item)) + "\n"
-        self.file.write(line)
-        return item
-
 class SolrPipeline(object):
     """
     Process item and store in Solr
@@ -31,43 +16,71 @@ class SolrPipeline(object):
     def __init__(self, solr_connection=SOLR):
         self.solr_connection = solr_connection
 
-    def process_item(self, item):
+    def close_spider(self, spider=None):
+        """
+        Defragment Solr database after spider completes task
+        """
+        print("Scraper: Optimizing cores and closing spider")
+        self.solr_connection.optimize()
+
+    def process_item(self, item, spider=None):
         """
         Match item type to predefined Schemas
         https://github.com/ubclaunchpad/sleuth/wiki/Schemas
         """
         if isinstance(item, ScrapyGenericPage):
-            solr_doc = self.__process_generic_page__(item)
-            solr_doc.save_to_solr(self.solr_connection)
+            self.__process_generic_page(item)
+        if isinstance(item, ScrapyCourseItem):
+            self.__process_course_item(item)
 
         return item
 
-    def __process_generic_page__(self, item):
+    def __process_generic_page(self, item):
         """
-        Convert Scrapy item to Solr GenericPage
+        Convert Scrapy item to Solr GenericPage and commit it to database
+        Schema specified by sleuth_backend.solr.models.GenericPage
         """
-        stamp = time.time()
-        style = '%Y-%m-%d %H:%M:%S'
         solr_doc = GenericPage(
             id=item["url"],
             type="genericPage",
-            updatedAt=datetime.datetime.fromtimestamp(stamp).strftime(style),
-            content=item["raw_content"]
+            sitename=item["title"],
+            updatedAt=self.__make_date(),
+            content=self.__parse_content(item["raw_content"]),
+            description=item["description"],
+            children=item["children"]
         )
-        return solr_doc
+        solr_doc.save_to_solr(self.solr_connection)
 
+    def __process_course_item(self, item):
+        """
+        Convert Scrapy item to Solr CourseItem and commit it to database
+        Schema specified by sleuth_backend.solr.models.CourseItem
+        """
+        subject = item["subject"]
+        subject_data = [subject["name"], subject["faculty"]]
+        solr_doc = CourseItem(
+            id=item["url"],
+            type="courseItem",
+            name=item["name"],
+            updatedAt=self.__make_date(),
+            description=item["description"],
+            subjectId=subject["url"],
+            subjectData=subject_data
+        )
+        solr_doc.save_to_solr(self.solr_connection)
 
-class CourseToDjangoPipeline(object):
-    """
-    Saves course data to Django
-    """
-    def open_spider(self, spider):
-        return
-    
-    def close_spider(self, spider):
-        return
+    def __make_date(self):
+        """
+        Make a UTC date string in format 'Y-m-d H:M:S'
+        """
+        stamp = time.time()
+        style = '%Y-%m-%d %H:%M:%S'
+        return datetime.datetime.fromtimestamp(stamp).strftime(style)
 
-    def process_item(self, item, spider):
-        return
-
-
+    def __parse_content(self, raw_content):
+        """
+        Parse content list into single string
+        TODO: make smarter
+        """
+        data = ' '.join(raw_content)
+        return data

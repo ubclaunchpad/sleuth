@@ -8,3 +8,4 @@ django-nose
 coverage
 coveralls
 scrapy
+bs4
