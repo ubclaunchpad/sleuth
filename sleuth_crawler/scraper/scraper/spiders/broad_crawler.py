@@ -38,23 +38,14 @@ class BroadCrawler(CrawlSpider):
         course_root = "courses.students.ubc.ca"
         if course_root in req.url:
             if "cs/main?pname=subjarea&tname=subjareas&req=0" in req.url:
-                return req.replace(callback=self.parse_subjects)
+                return req.replace(callback=course_parser.parse_subjects)
             else:
                 return
         
         return req
         
-    """
-    Functions pointing to parser modules
-    """
     def parse_generic_item(self, response):
+        """
+        Points to generic_page_parser
+        """
         return generic_page_parser.parse_generic_item(response, self.GENERIC_LINK_EXTRACTOR)
-
-    def parse_subjects(self, response):
-        return course_parser.parse_subjects(response)
-
-    def parse_subjects_helper(self, response):
-        return course_parser.parse_course_helper(response)
-
-    def parse_course_details(self, response):
-        return course_parser.parse_course_details(response)
