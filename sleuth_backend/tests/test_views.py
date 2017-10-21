@@ -1,5 +1,7 @@
 import json
+import pysolr
 from django.test import TestCase
+from django.http import HttpResponse
 from unittest.mock import MagicMock, patch
 from sleuth_backend.views.views import cores, search
 
@@ -76,7 +78,27 @@ class TestAPI(TestCase):
         }
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
-        print('Response content is ' + str(result.content))
-        response_body = json.loads(result.content)
         self.assertEqual(result.status_code, 200)
-        self.assertEqual(response_body, mock_query.return_value)
+        self.assertEqual(result.content.decode("utf-8"), mock_query.return_value)
+
+    @patch('sleuth_backend.solr.connection.SolrConnection.query')
+    def test_search_with_error_response(self, mock_query):
+        mock_query.return_value = json.dumps({
+            "error": {
+                "msg": "org.apache.solr.search.SyntaxError",
+                "code": 400,
+            }
+        })
+        params = {
+            'q': 'somequery',
+            'core': 'test',
+        }
+        expected_response = json.dumps({
+            "message": "org.apache.solr.search.SyntaxError",
+            "errorType": "SOLR_SEARCH_ERROR",
+        })
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.content.decode("utf-8"), expected_response)
+

@@ -75,7 +75,8 @@ def search(request):
         return HttpResponse(sleuth_error.json(), status=400)
 
     try:
-        response = json.loads(SOLR.query(core, query, **kwargs))
+        query_response = SOLR.query(core, query, **kwargs)
+        response = json.loads(query_response)
     except pysolr.SolrError as e:
         sleuth_error = SleuthError(ErrorTypes.SOLR_SEARCH_ERROR, str(e))
         return HttpResponse(sleuth_error.json(), status=400)
@@ -92,4 +93,4 @@ def search(request):
             message=response['error']['msg']
         )
         return HttpResponse(sleuth_error.json(), status=response['error']['code'])
-    return HttpResponse(response)
+    return HttpResponse(query_response)

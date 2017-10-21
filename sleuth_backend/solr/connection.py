@@ -111,7 +111,7 @@ class SolrConnection(object):
     def _get_url(self, url, params={}):
         """
         Makes a request to the given url relative to the base url with the given
-        parameters and returns the response.
+        parameters and returns the response as a JSON string.
         """
         response = requests.get(url, params=pysolr.safe_urlencode(params))
         return pysolr.force_unicode(response.content)
