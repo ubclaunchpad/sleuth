@@ -92,13 +92,19 @@ class TestSolrConnection(TestCase):
     @patch('pysolr.Solr')
     @patch('pysolr.SolrCoreAdmin')
     def test_optimize(self, admin_mock, solr_mock):
-        solr_mock.return_value = MagicMock()
-        admin_mock.return_value = MockAdmin()
+        status_response = {
+            "status": {
+                "c1": True,
+                "c2": True,
+            }
+        }
+        solr_mock.return_value = MockSolr()
+        admin_mock.return_value = MockAdmin(status_response=status_response)
         solr_connection = SolrConnection("http://a.test.url/solr")
         solr_connection.cores["generic_page"] = MagicMock()
         solr_connection.cores["c1"] = MagicMock()
         solr_connection.cores["c2"] = MagicMock()
-        
+
         solr_connection.optimize("generic_page")
         self.assertTrue(solr_connection.cores["generic_page"].optimize.called)
 

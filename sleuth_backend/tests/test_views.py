@@ -99,6 +99,6 @@ class TestAPI(TestCase):
         })
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
-        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.status_code, 400)
         self.assertEqual(result.content.decode("utf-8"), expected_response)
 
