@@ -108,6 +108,20 @@ class SolrConnection(object):
 
         return self._get_url("{}/{}/select".format(self.url, core), params=params)
 
+    def optimize(self, core_name=None):
+        """
+        Performs defragmentation of all/specified core(s) in Solr database
+        Optionally accepts ``core_name``. Default is ``None`
+        """
+        if core_name:
+            try:
+                self.cores[core_name].optimize()
+            except KeyError as e:
+                raise KeyError('No Solr core with the name "{}" was found'.format(core_name))
+        else:
+            for core in self.core_names():
+                self.cores[core].optimize()
+
     def _get_url(self, url, params={}):
         """
         Makes a request to the given url relative to the base url with the given

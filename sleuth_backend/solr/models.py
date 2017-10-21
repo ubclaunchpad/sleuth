@@ -49,15 +49,13 @@ class GenericPage(SolrDocument):
         "updatedAt": "",
         "pageName": "",
         "pageTitle": "",
-        "content": ""
+        "description": "",
+        "content": "",
+        "children": []
     }
 
     def __init__(self, **kwargs):
         super(GenericPage, self).__init__(self.doc, **kwargs)
-        if 'blurb' in kwargs:
-            self.blurb = kwargs['blurb'] 
-        else:
-            self.blurb = ""
 
     def output_format(self):
         return {
@@ -68,6 +66,38 @@ class GenericPage(SolrDocument):
                 "updatedAt": self.doc['updatedAt'],
                 "pageName": self.doc['pageName'],
                 "pageTitle": self.doc['pageTitle'],
-                "blurb": self.blurb
+                "description": self.doc['description']
+            }
+        }
+
+class CourseItem(SolrDocument):
+    """
+    Represents a UBC course.
+    """
+    doc = {
+        "id": "",
+        "type": "courseItem",
+        "name": "",
+        "updatedAt": "",
+        "description": "",
+        "subjectId": "",
+        "subjectData": []
+    }
+
+    def __init__(self, **kwargs):
+        super(CourseItem, self).__init__(self.doc, **kwargs)
+
+    def output_format(self):
+        return {
+            "id": self.doc['id'],
+            "type": self.doc['type'],
+            "name": self.doc['name'],
+            "data": {
+                "updatedAt": self.doc['updatedAt'],
+                "description": self.doc['description'],
+                "subject": {
+                    "subjectId": self.doc['subjectId'],
+                    "subjectData": []
+                }
             }
         }

@@ -12,7 +12,8 @@ services:
      - "8983:8983"
     entrypoint: [
       "/opt/docker-solr/scripts/start-solr.sh",
-      "genericPage"
+      "genericPage",
+      "courseItem"
     ]
 
   web:
