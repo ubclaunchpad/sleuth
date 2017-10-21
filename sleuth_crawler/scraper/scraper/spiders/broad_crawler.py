@@ -48,4 +48,7 @@ class BroadCrawler(CrawlSpider):
         """
         Points to generic_page_parser
         """
-        return generic_page_parser.parse_generic_item(response, self.GENERIC_LINK_EXTRACTOR)
+        children = []
+        for link in self.GENERIC_LINK_EXTRACTOR.extract_links(response):
+            children.append(link.url)
+        return generic_page_parser.parse_generic_item(response, children)

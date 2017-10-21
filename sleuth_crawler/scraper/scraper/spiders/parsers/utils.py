@@ -18,6 +18,7 @@ def strip_content(data):
                 lines.append(line.strip())
         return lines
     except Exception:
+        # if page is not a webpage, catch errors on attempted parse
         return None
 
 def extract_element(item_list, index):
@@ -27,4 +28,4 @@ def extract_element(item_list, index):
     try:
         return item_list[index].extract()
     except IndexError:
-        return None
+        return ""
