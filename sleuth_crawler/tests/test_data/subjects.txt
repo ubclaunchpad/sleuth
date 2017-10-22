@@ -1,0 +1,27 @@
+<table class="sortable table table-striped" id="mainTable" >
+<thead>
+  <tr class=listHeader>
+    <th>Subject Code</th><th>Subject Title</th><th>Faculty / School</th>
+  </tr>
+</thead>
+<tbody>
+<tr class=&#39;section1&#39;>
+<td>
+  <a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=1&amp;dept=AANB">AANB</a>
+</td>
+<td>Applied Animal Biology                             </td>
+<td>Faculty of Land and Food Systems</td></tr><tr class=&#39;section2&#39;>
+
+<td>
+  <a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=1&amp;dept=ACAM">ACAM</a>
+</td>
+<td>Asian Canadian and Asian Migration Studies         </td>
+<td>Faculty of Arts</td></tr><tr class=&#39;section1&#39;>
+
+<td>
+  <a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=1&amp;dept=ADHE">ADHE</a>
+</td>
+<td>Adult and Higher Education                         </td>
+<td>Faculty of Education</td></tr><tr class=&#39;section2&#39;>
+</tbody>
+</table>

@@ -1,0 +1,35 @@
+<h4>GRSJ 101 Introduction to Social Justice</h4>
+<p>
+An overview of intersectional feminist debates and theoretical traditions. Credit will be granted for only one of WMST 100 or GRSJ 101.
+</p>
+
+<table class="table table-bordered mobile-content" ></table>  
+<table class="table table-striped section-summary" >
+<thead><tr>
+<th>Status</th><th>Section</th><th>Activity</th><th>Term</th><th>Interval</th><th>Days</th><th>Start Time</th><th>End Time</th><th>Comments</th>
+</tr></thead>
+<tr class=&#39;section1&#39;><td>Blocked</td>
+<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=5&amp;dept=GRSJ&amp;course=101&amp;section=001" onmouseover="cancelHide=1; popup(); setColor(new Array('t1-4-0','t1-5-0','t1-4-2','t1-5-2','t1-4-4','t1-5-4'),'06739');" onmouseout="cancelHide=0;setTimeout('hideLayer()',2000)">
+GRSJ 101 001
+</a>
+</td>
+
+<td>Lecture</td><td>1</td><td></td>
+<td> Mon Wed Fri</td>
+<td>9:00</td><td>10:00</td>
+<td class="section-comments"><div class='accordion-group accordion-comments'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse'  href='#GRSJ1010010'><img border=0 src="/static/shared/images/go_right.gif" alt='Arrow'>&nbsp; Section Comments </a> </div><div id='GRSJ1010010' class='accordion-body collapse'><div class='accordion-inner'><p>When this course is full it may be blocked to accommodate waitlisted students.</p></div> </div> </div></td>
+</tr><tr class=&#39;section2&#39;><td>Blocked</td>
+<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=5&amp;dept=GRSJ&amp;course=101&amp;section=002" onmouseover="cancelHide=1; popup(); setColor(new Array('t1-5-1','t1-6-1','t1-7-1','t1-5-3','t1-6-3','t1-7-3'),'22371');" onmouseout="cancelHide=0;setTimeout('hideLayer()',2000)">
+GRSJ 101 002
+</a></td>
+
+<td>Lecture</td><td>1</td><td></td>
+<td> Tue Thu</td><td>9:30</td><td>11:00</td>
+<td class="section-comments"><div class='accordion-group accordion-comments'><div class='accordion-heading'><a class='accordion-toggle' data-toggle='collapse'  href='#GRSJ1010020'><img border=0 src="/static/shared/images/go_right.gif" alt='Arrow'>&nbsp; Section Comments </a> </div><div id='GRSJ1010020' class='accordion-body collapse'><div class='accordion-inner'><p>When this course is full it may be blocked to accommodate waitlisted students.</p></div> </div> </div></td>
+</tr><tr class=&#39;section1&#39;><td>&nbsp;</td>
+<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=5&amp;dept=GRSJ&amp;course=101&amp;section=WL2" onmouseover="cancelHide=1; popup(); setColor(new Array('t1-5-1','t1-6-1','t1-5-3','t1-6-3'),'15105');" onmouseout="cancelHide=0;setTimeout('hideLayer()',2000)">
+GRSJ 101 WL2
+</a>  </td>
+
+<td>Waiting List</td><td>1</td><td></td>
+<td> Tue Thu</td><td>9:30</td><td>10:30</td><td class="section-comments"></td>
