@@ -11,7 +11,6 @@ class TestGenericPage(TestCase):
             "siteName": "testname",
             "updatedAt": "9827359348752937402",
             "pageName": "testpage",
-            "pageTitle": "testtitle",
             "content": "testcontent",
             "description": "testblurb",
             "children": []
@@ -34,7 +33,6 @@ class TestGenericPage(TestCase):
                 "data": {
                     "updatedAt": args["updatedAt"],
                     "pageName": args["pageName"],
-                    "pageTitle": args["pageTitle"],
                     "description": args["description"]
                 }
             },

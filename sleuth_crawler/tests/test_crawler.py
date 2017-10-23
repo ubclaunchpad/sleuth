@@ -1,31 +1,47 @@
 from django.test import TestCase
+from unittest.mock import patch
 from sleuth_crawler.tests.mocks import mock_response
 from sleuth_crawler.scraper.scraper.spiders.broad_crawler import *
 from sleuth_crawler.scraper.scraper.items import *
 import re
 
-class TestUbcBroadCralwer(TestCase):
+class TestBroadCralwer(TestCase):
     """
-    Test UbcBroadCrawler
-    ubc_homepage_spider.py
+    Test BroadCrawler
+    spiders.broad_crawler
     """
     def setUp(self):
         self.spider = BroadCrawler()
 
-    def test_parse_item(self):
+    def test_request_filtering(self):
         """
-        Test single item parse
+        Test filtering normal requests
         """
-        response = mock_response('/test_data/ubc.txt', 'http://www.ubc.ca')
-        item = self.spider.parse_generic_item(response)
-        item = ScrapyGenericPage(item)
-        self.assertEqual(item['url'], "http://www.ubc.ca")
-        self.assertTrue(len(item['raw_content']) > 0)
-        self.assertTrue(len(item['children']) > 0)
-        self.assertEqual(item['description'], "The University of British Columbia is a global centre for research and teaching, consistently ranked among the top 20 public universities in the world.")
+        # Direct non-matching requests to default parser (GenericPage)
+        req_in = scrapy.Request('https://www.ubc.ca')
+        req = self.spider.process_req(req_in)
+        self.assertTrue(req)
+        self.assertFalse(req.callback)
 
-        # Check that there are no HTML tags and no blank lines
-        regexp = re.compile(r'<[^>]*?>')
-        for line in item['raw_content']:
-            self.assertTrue(len(line) > 0)
-            self.assertFalse(regexp.search(line))
+    def test_request_filtering_course(self):
+        """
+        Test filtering course requests
+        """
+        # Redirect to parse_subjects if parent courses page
+        req_pass = scrapy.Request('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0')
+        req = self.spider.process_req(req_pass)
+        self.assertEqual(req.callback.__name__, course_parser.parse_subjects.__name__)
+
+        # Discard request if children courses page
+        req_discard = scrapy.Request('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=ASTR')
+        req = self.spider.process_req(req_discard)
+        self.assertFalse(req)
+
+    @patch('sleuth_crawler.scraper.scraper.spiders.broad_crawler.BroadCrawler.parse_generic_item')
+    def test_parse_generic_item(self, fake_parser):
+        """
+        Test crawler's redirect to generic_page_parser as default parser
+        """
+        response = mock_response()
+        self.spider.parse_generic_item(response)
+        self.assertTrue(fake_parser.called)

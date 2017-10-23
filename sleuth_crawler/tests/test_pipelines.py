@@ -16,18 +16,18 @@ class TestSolrPipeline(TestCase):
         """
         Test Generic Page processing
         """
+        self.fake_solr.reset_mock()
         item = ScrapyGenericPage(
             url="http://www.ubc.ca",
             title="",
+            site_title="",
             description="",
             raw_content=["description1","description2"],
             children=["www.google.com","www.reddit.com"]
         )
         self.pipeline.process_item(item)
 
-        args = self.fake_solr.insert_document.call_args[0]
-        self.assertTrue(args[0])
-        self.assertTrue(args[1])
+        args = self.__assert_and_return_args()
         doc_type = args[0]
         doc = args[1]
         self.assertEqual("genericPage", doc_type)
@@ -37,6 +37,36 @@ class TestSolrPipeline(TestCase):
         self.assertTrue(doc["updatedAt"])
         print("Timestamp: " + doc["updatedAt"])
 
+    def test_process_course_item(self):
+        """
+        Test Course Item processing
+        """
+        self.fake_solr.reset_mock()
+        item = ScrapyCourseItem(
+            subject={"url":"some.url","name":"somename","faculty":"somefaculty"},
+            url="subject.url",
+            name="CPSC110 Trust the Natural Recursion",
+            description="racket"
+        )
+        self.pipeline.process_item(item)
+        args = self.__assert_and_return_args()
+        doc_type = args[0]
+        doc = args[1]
+        self.assertEqual("courseItem", doc_type)
+        self.assertEqual("subject.url", doc["id"])
+        #TODO
+
     def test_close_spider(self):
+        """
+        Test that closing spider calls solrConnection.optimize()
+        """
         self.pipeline.close_spider()
         self.assertTrue(self.fake_solr.optimize.called)
+
+    def __assert_and_return_args(self):
+        args = self.fake_solr.insert_document.call_args[0]
+        self.assertTrue(args[0])
+        self.assertTrue(args[1])
+        doc_type = args[0]
+        doc = args[1]
+        return [doc_type, doc]

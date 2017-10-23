@@ -7,10 +7,10 @@ def mock_response(file_name=None, url=None):
 
     if not url:
         url = 'http://www.ubc.ca'
+    request = Request(url=url)
 
     if file_name:
         file_path = "sleuth_crawler/tests" + file_name
-        request = Request(url=url)
         file_content = open(file_path, 'r').read()
     else:
         file_content = ""
