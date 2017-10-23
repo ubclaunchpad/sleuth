@@ -37,11 +37,11 @@ class TestBroadCralwer(TestCase):
         req = self.spider.process_req(req_discard)
         self.assertFalse(req)
 
-    @patch('sleuth_crawler.scraper.scraper.spiders.broad_crawler.BroadCrawler.parse_generic_item')
+    @patch('sleuth_crawler.scraper.scraper.spiders.parsers.generic_page_parser.parse_generic_item')
     def test_parse_generic_item(self, fake_parser):
         """
         Test crawler's redirect to generic_page_parser as default parser
         """
-        response = mock_response()
+        response = mock_response(file_name='/test_data/ubc.txt')
         self.spider.parse_generic_item(response)
         self.assertTrue(fake_parser.called)

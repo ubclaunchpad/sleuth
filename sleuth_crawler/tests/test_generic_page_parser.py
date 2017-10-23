@@ -23,6 +23,8 @@ class TestGenericPageParser(TestCase):
         self.assertTrue(len(item['children']) > 0)
         self.assertEqual(item['description'], "The University of British Columbia is a global centre for research and teaching, consistently ranked among the top 20 public universities in the world.")
         self.assertEqual(item['children'], children)
+        self.assertEqual(item['title'], "Homepage")
+        self.assertEqual(item['site_title'], "The University of British Columbia")
 
         # Check that there are no HTML tags, no blank lines, no JavaScript
         html_regexp = re.compile(r'<[^>]*?>')
