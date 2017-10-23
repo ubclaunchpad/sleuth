@@ -13,6 +13,7 @@ class ScrapyGenericPage(scrapy.Item):
     """
     url = scrapy.Field()
     title = scrapy.Field()
+    site_title = scrapy.Field()
     description = scrapy.Field()
     raw_content = scrapy.Field()
     children = scrapy.Field()

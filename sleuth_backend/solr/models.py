@@ -48,7 +48,6 @@ class GenericPage(SolrDocument):
         "siteName": "",
         "updatedAt": "",
         "pageName": "",
-        "pageTitle": "",
         "description": "",
         "content": "",
         "children": []
@@ -65,7 +64,6 @@ class GenericPage(SolrDocument):
             "data": {
                 "updatedAt": self.doc['updatedAt'],
                 "pageName": self.doc['pageName'],
-                "pageTitle": self.doc['pageTitle'],
                 "description": self.doc['description']
             }
         }
