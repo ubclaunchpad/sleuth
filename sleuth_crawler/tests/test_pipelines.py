@@ -19,8 +19,8 @@ class TestSolrPipeline(TestCase):
         self.fake_solr.reset_mock()
         item = ScrapyGenericPage(
             url="http://www.ubc.ca",
-            title="",
-            site_title="",
+            title="title",
+            site_title="site title",
             description="",
             raw_content=["description1","description2"],
             children=["www.google.com","www.reddit.com"]
@@ -36,6 +36,8 @@ class TestSolrPipeline(TestCase):
         self.assertTrue(len(doc["children"])==2)
         self.assertTrue(doc["updatedAt"])
         print("Timestamp: " + doc["updatedAt"])
+        self.assertEqual("title", doc["pageName"])
+        self.assertEqual("site title", doc["siteName"])
 
     def test_process_course_item(self):
         """
