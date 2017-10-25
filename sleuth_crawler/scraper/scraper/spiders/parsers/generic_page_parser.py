@@ -1,5 +1,5 @@
 import scrapy
-import sleuth_crawler.scraper.scraper.spiders.parsers.utils as utils
+from sleuth_crawler.scraper.scraper.spiders.parsers import utils
 from sleuth_crawler.scraper.scraper.items import ScrapyGenericPage
 
 def parse_generic_item(response, children):

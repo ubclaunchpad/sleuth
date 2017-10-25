@@ -1,5 +1,5 @@
 import scrapy
-import sleuth_crawler.scraper.scraper.spiders.parsers.utils as utils
+from sleuth_crawler.scraper.scraper.spiders.parsers import utils
 from sleuth_crawler.scraper.scraper.items import ScrapyCourseItem
 
 BASE_URL = "https://courses.students.ubc.ca"

@@ -27,7 +27,7 @@ class TestUtils(TestCase):
         )
         data_invalid = {}
         self.assertEqual(
-            utils.strip_content(data_invalid), [""]
+            utils.strip_content(data_invalid), []
         )
 
     def test_extract_element(self):
