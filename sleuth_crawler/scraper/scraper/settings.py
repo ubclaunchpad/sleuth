@@ -21,9 +21,10 @@ SPIDER_MODULES = ['scraper.spiders']
 NEWSPIDER_MODULE = 'scraper.spiders'
 
 # List approved starting URLs to be crawled by BroadCrawler
+# Place specific domains before www.ubc.ca
 PARENT_URLS = [
-    'http://www.ubc.ca',
     'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0',
+    'http://www.ubc.ca',
 ]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

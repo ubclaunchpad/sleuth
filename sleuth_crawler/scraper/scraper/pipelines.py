@@ -43,7 +43,8 @@ class SolrPipeline(object):
         solr_doc = GenericPage(
             id=item["url"],
             type="genericPage",
-            sitename=item["title"],
+            siteName=item["site_title"],
+            pageName=item["title"],
             updatedAt=self.__make_date(),
             content=self.__parse_content(item["raw_content"]),
             description=item["description"],

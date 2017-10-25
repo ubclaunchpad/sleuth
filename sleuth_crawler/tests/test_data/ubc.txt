@@ -6,7 +6,7 @@
 <!--[[if (gt IE 9)|(gt IEMobile 7)]><!--><html lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>The University of British Columbia</title>
+<title>Homepage | The University of British Columbia</title>
 <meta name="viewport" content="width=device-width">
 <meta name="description" content="The University of British Columbia is a global centre for research and teaching, consistently ranked among the top 20 public universities in the world.">
 <meta property="fb:pages" content="16761458703">

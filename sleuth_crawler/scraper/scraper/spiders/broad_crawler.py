@@ -46,7 +46,7 @@ class BroadCrawler(CrawlSpider):
         
     def parse_generic_item(self, response):
         """
-        Points to generic_page_parser
+        Points to generic_page_parser (the default parser for this crawler)
         """
         children = []
         for link in self.GENERIC_LINK_EXTRACTOR.extract_links(response):
