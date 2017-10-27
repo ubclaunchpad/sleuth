@@ -66,13 +66,15 @@ def search(request):
         'start': request.GET.get('start', ''),
         'rows': request.GET.get('rows', ''),
         'default_field': 'content',
-        'return_fields': 'id,siteName,updatedAt,pageName,pageTitle',
+        'return_fields': 'id,siteName,updatedAt,pageName,description',
         'highlight_fields': 'content',
     }
 
     if core is '' or query is '':
         sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST)
         return HttpResponse(sleuth_error.json(), status=400)
+
+    query = __build_search_query(query, core)
 
     try:
         query_response = SOLR.query(core, query, **kwargs)
@@ -94,3 +96,25 @@ def search(request):
         )
         return HttpResponse(sleuth_error.json(), status=response['error']['code'])
     return HttpResponse(query_response)
+
+def __build_search_query(query, core):
+    '''
+    Builds a serach query that is most likely to return the best results
+    for the given core using the given user query. See
+    https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
+    for more information about Apache Lucene query syntax.
+    '''
+    detailed_query = '{}'
+    args = [query]
+
+    # Set detailed query format and args to match the core you are querying
+    if core is 'genericPore':
+        # Returns results with a phrase matching the user's query
+        phrase_query = '(id:"{}" OR siteName:"{}" OR pageName:"{}" OR content:"{}")^2'
+        # Returns results with
+        any_word_query = '(id:{} OR siteName:{} OR pageName:{} OR content:{})'
+        detailed_query = '{} OR {}'.format(phrase_query, any_word_query)
+        args = [query, query, query, query, query, query, query, query]
+    # TODO: add a case to support course search
+
+    return detailed_query.format(*args)

@@ -91,6 +91,7 @@ class SolrConnection(object):
             "wt": "json",
             "df": default_field,
             "omitHeader": "true" if omit_header else "false",
+            "hl.fragsize": 200
         }
         if sort is not "":
             params["sort"] = sort
