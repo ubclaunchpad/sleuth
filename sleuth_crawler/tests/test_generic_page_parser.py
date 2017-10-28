@@ -33,3 +33,15 @@ class TestGenericPageParser(TestCase):
             self.assertTrue(len(line) > 0)
             self.assertFalse(html_regexp.search(line))
             self.assertFalse(js_regexp.search(line))
+
+    def test_title_parsing(self):
+        """
+        Test how site_title is assembled from site Title element
+        """
+        response = mock_response('<title>Homepage - Subtitle 1 - Subtitle 2 - The University of British Columbia</title>')
+        item = ScrapyGenericPage(parser.parse_generic_item(response))
+        self.assertEqual(item['site_title'], "Subtitle 2 - The University of British Columbia")
+
+        response = mock_response('<title>Engineering alumna gives back as a WiSE Mentor | Women in Science and Engineering</title>')
+        item = ScrapyGenericPage(parser.parse_generic_item(response))
+        self.assertEqual(item['site_title'], "Women in Science and Engineering")
