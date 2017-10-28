@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from .error import SleuthError, ErrorTypes
 from sleuth_backend.solr import connection as solr
 from sleuth.settings import HAYSTACK_CONNECTIONS
+from sleuth_backend.solr.query_builder import Query, QueryBuilder
 
 SOLR = solr.SolrConnection(HAYSTACK_CONNECTIONS['default']['URL'])
 DEFAULT_CORE = "test"
@@ -97,24 +98,29 @@ def search(request):
         return HttpResponse(sleuth_error.json(), status=response['error']['code'])
     return HttpResponse(query_response)
 
-def __build_search_query(query, core):
+def __build_search_query(query_str, core):
     '''
     Builds a serach query that is most likely to return the best results
     for the given core using the given user query. See
     https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
     for more information about Apache Lucene query syntax.
     '''
-    detailed_query = '{}'
-    args = [query]
+    query = Query(query_str)
+    builder = QueryBuilder()
 
     # Set detailed query format and args to match the core you are querying
-    if core is 'genericPore':
-        # Returns results with a phrase matching the user's query
-        phrase_query = '(id:"{}" OR siteName:"{}" OR pageName:"{}" OR content:"{}")^2'
-        # Returns results with
-        any_word_query = '(id:{} OR siteName:{} OR pageName:{} OR content:{})'
-        detailed_query = '{} OR {}'.format(phrase_query, any_word_query)
-        args = [query, query, query, query, query, query, query, query]
+    if core == 'genericPage':
+        fields = {
+            'id': 1,
+            'siteName': 10,
+            'pageName': 10,
+            'description': 5,
+            'content': 2
+        }
+        phrase_query = builder.build_query(query_str, fields, as_phrase=True)
+        terms_query = builder.build_query(query_str, fields)
+        query = phrase_query.or_op(terms_query)
+
     # TODO: add a case to support course search
 
-    return detailed_query.format(*args)
+    return str(query)

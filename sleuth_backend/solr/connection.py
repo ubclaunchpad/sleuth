@@ -40,7 +40,7 @@ class SolrConnection(object):
         """
         Returns the schema of the core with the given name as a dictionary.
         """
-        response = self._get_url("{}/{}/schema".format(self.url, name))
+        response = self._get_url("{}/{}/schema".format(self.url, name), {})
         body = json.loads(response)
 
         if 'schema' not in body:
@@ -107,7 +107,7 @@ class SolrConnection(object):
             params["hl"] = "on"
             params["hl.fl"] = highlight_fields
 
-        return self._get_url("{}/{}/select".format(self.url, core), params=params)
+        return self._get_url("{}/{}/select".format(self.url, core), params)
 
     def optimize(self, core_name=None):
         """
@@ -123,7 +123,7 @@ class SolrConnection(object):
             for core in self.core_names():
                 self.cores[core].optimize()
 
-    def _get_url(self, url, params={}):
+    def _get_url(self, url, params):
         """
         Makes a request to the given url relative to the base url with the given
         parameters and returns the response as a JSON string.
