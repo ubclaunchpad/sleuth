@@ -41,13 +41,12 @@ class SolrConnection(object):
         Returns the schema of the core with the given name as a dictionary.
         """
         response = self._get_url("{}/{}/schema".format(self.url, name), {})
-        body = json.loads(response)
 
-        if 'schema' not in body:
+        if 'schema' not in response:
             raise ValueError('Solr did not return a schema. Are you sure ' + \
                 'the core named "{}" is an existing core?'.format(name))
 
-        return body['schema']
+        return response['schema']
 
     def insert_document(self, core, doc):
         """
@@ -129,4 +128,4 @@ class SolrConnection(object):
         parameters and returns the response as a JSON string.
         """
         response = requests.get(url, params=pysolr.safe_urlencode(params))
-        return pysolr.force_unicode(response.content)
+        return response.json()

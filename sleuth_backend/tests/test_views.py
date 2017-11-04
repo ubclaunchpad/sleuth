@@ -55,7 +55,8 @@ class TestAPI(TestCase):
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_search_with_valid_request(self, mock_query):
-        mock_query.return_value = json.dumps({
+        mock_query.return_value = {
+            "type": "genericPage",
             "response": {
                 "numFound": 1,
                 "start": 0,
@@ -71,7 +72,7 @@ class TestAPI(TestCase):
                     "content": ['Nice one dude']
                 }
             }
-        })
+        }
         params = {
             'q': 'somequery',
             'core': 'test',
@@ -79,16 +80,54 @@ class TestAPI(TestCase):
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
         self.assertEqual(result.status_code, 200)
-        self.assertEqual(result.content.decode("utf-8"), mock_query.return_value)
+        self.assertEqual(
+            result.content.decode("utf-8"), 
+            str({
+                "data":[mock_query.return_value]
+            })
+        )
+
+    @patch('sleuth_backend.solr.connection.SolrConnection.core_names')
+    @patch('sleuth_backend.solr.connection.SolrConnection.query')
+    def test_search_multicore(self, mock_query, mock_cores):
+        mock_query.return_value = {
+            "type": "genericPage",
+            "response": {
+                "numFound": 1,
+                "start": 0,
+                "docs": [
+                    {
+                        "id": "www.cool.com",
+                        "content": "Nice one dude",
+                    }
+                ]
+            },
+            "highlighting": {
+                "www.cool.com": {
+                    "content": ['Nice one dude']
+                }
+            }
+        }
+        mock_cores.return_value = ['genericPage', 'genericPage']
+        params = { 'q': 'somequery' }
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(
+            result.content.decode("utf-8"), 
+            str({
+                "data":[mock_query.return_value, mock_query.return_value]
+            })
+        )
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_search_with_error_response(self, mock_query):
-        mock_query.return_value = json.dumps({
+        mock_query.return_value = {
             "error": {
                 "msg": "org.apache.solr.search.SyntaxError",
                 "code": 400,
             }
-        })
+        }
         params = {
             'q': 'somequery',
             'core': 'test',

@@ -36,6 +36,9 @@ class MockResponse(object):
     def __init__(self, content):
         self.content = content
 
+    def json(self):
+        return self.content
+
 class TestSolrConnection(TestCase):
 
     def create_instance(self, admin_mock, solr_mock):
@@ -77,7 +80,7 @@ class TestSolrConnection(TestCase):
                 "url": "http://a.test.url/solr/test/schema"
             }
         }
-        get_mock.return_value = MockResponse(json.dumps(expected_response))
+        get_mock.return_value = MockResponse(expected_response)
         self.assertEqual(expected_response["schema"], solr_connection.fetch_core_schema("test"))
 
     @patch('pysolr.Solr')
@@ -135,9 +138,9 @@ class TestSolrConnection(TestCase):
             }
         }
         solr_connection = self.create_instance(admin_mock, solr_mock)
-        get_mock.return_value = MockResponse(json.dumps(response_content))
+        get_mock.return_value = MockResponse(response_content)
 
         result = solr_connection.query('genericPage', 'test', sort="updatedAt desc",
             start=5, rows=10, default_field="content", search_fields="content id",
             highlight_fields="content")
-        self.assertEqual(json.dumps(response_content), result)
+        self.assertEqual(response_content, result)
