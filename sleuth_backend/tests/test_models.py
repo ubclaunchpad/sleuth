@@ -36,39 +36,6 @@ class TestModels(TestCase):
         for (key, value) in args.items():
             self.assertEqual(value, page.doc[key])
 
-    def test_output_formats(self):
-        args, page = self.create_page("genericPage")
-        self.assertEqual(
-            {
-                "id": args["id"],
-                "type": args["type"],
-                "name": args["name"],
-                "data": {
-                    "updatedAt": args["updatedAt"],
-                    "siteName": args["siteName"],
-                    "description": args["description"]
-                }
-            },
-            page.output_format()
-        )
-        args, page = self.create_page("courseItem")
-        self.assertEqual(
-            {
-                "id": args['id'],
-                "type": args['type'],
-                "name": args['name'],
-                "data": {
-                    "updatedAt": args['updatedAt'],
-                    "description": args['description'],
-                    "subject": {
-                        "subjectId": args['subjectId'],
-                        "subjectData": args['subjectData']
-                    }
-                }
-            },
-            page.output_format()
-        )
-
     def test_type(self):
         _, page = self.create_page("genericPage")
         self.assertEqual(page.type(), "genericPage")

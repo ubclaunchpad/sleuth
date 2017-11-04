@@ -26,13 +26,6 @@ class SolrDocument(object):
             if key in kwargs and key is not "type":
                 doc[key] = kwargs[key]
 
-    def output_format(self):
-        """
-        Returns the document in JSON format as it is supposed to be returned 
-        from a Sleuth API response. This method must be overridden.
-        """
-        pass
-
     def save_to_solr(self, solr_connection):
         """
         Submits the document to the given Solr connection. This method should not
@@ -65,18 +58,6 @@ class GenericPage(SolrDocument):
     def __init__(self, **kwargs):
         super(GenericPage, self).__init__(self.doc, **kwargs)
 
-    def output_format(self):
-        return {
-            "id": self.doc['id'],
-            "type": self.doc['type'],
-            "name": self.doc['name'],
-            "data": {
-                "updatedAt": self.doc['updatedAt'],
-                "siteName": self.doc['siteName'],
-                "description": self.doc['description']
-            }
-        }
-
 class CourseItem(SolrDocument):
     """
     Represents a UBC course.
@@ -93,18 +74,3 @@ class CourseItem(SolrDocument):
 
     def __init__(self, **kwargs):
         super(CourseItem, self).__init__(self.doc, **kwargs)
-
-    def output_format(self):
-        return {
-            "id": self.doc['id'],
-            "type": self.doc['type'],
-            "name": self.doc['name'],
-            "data": {
-                "updatedAt": self.doc['updatedAt'],
-                "description": self.doc['description'],
-                "subject": {
-                    "subjectId": self.doc['subjectId'],
-                    "subjectData": self.doc['subjectData']
-                }
-            }
-        }

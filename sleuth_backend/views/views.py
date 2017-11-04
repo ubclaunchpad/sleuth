@@ -1,6 +1,7 @@
 import pysolr
 import re
 import json
+import sys
 from django.http import HttpResponse
 from .error import SleuthError, ErrorTypes
 from sleuth_backend.solr import connection as solr
@@ -28,12 +29,13 @@ def search(request):
     connected Solr instance.
 
     Params:
-        core: (optional) the name of the core to search in. search all cores by default
+        core: (optional) the name of the core to search in - all cores by default
         q: the term or phrase to search for
         sort: see Solr docs for sort syntax
         start: the index of the first result to return
         rows: the number of results to return starting from the start index
-        return: the desired return fields. see sleuth_backend.solr.models
+        return: the desired return fields - see sleuth_backend.solr.models
+        state: any string to be returned in response
 
     Example Usage:
     http:// ... /api/search/?q=hello&core=genericPage&return=children
@@ -68,7 +70,8 @@ def search(request):
                 "response": { ... },
                 "highlighting": { ... }
             }
-        ]
+        ],
+        "request": { <data about your original request, state will be here too> }
     }
 
     '''
@@ -77,11 +80,12 @@ def search(request):
 
     core = request.GET.get('core', '')
     query = request.GET.get('q', '')
-    requested_return_fields = request.GET.get('return', '')
-    return_fields = 'id,updatedAt,name,description'
-    if requested_return_fields is not '':
-        return_fields = ',' + requested_return_fields
+    state = request.GET.get('state', '')
 
+    return_fields = 'id,updatedAt,name,description'
+    requested_return_fields = request.GET.get('return', '')
+    if requested_return_fields is not '':
+        return_fields = return_fields + ',' + requested_return_fields
     kwargs = {
         'sort': request.GET.get('sort', ''),
         'start': request.GET.get('start', ''),
@@ -100,14 +104,30 @@ def search(request):
     else:
         cores_to_search.append(core)
 
+    return_fields_list = return_fields.split(",")
     responses = {
         'data':[]
     }
     for core_to_search in cores_to_search:
         try:
-            query, kwargs = _build_search_query(core_to_search, query, kwargs)
-            query_response = SOLR.query(core_to_search, query, **kwargs)
+            new_query, new_kwargs = _build_search_query(core_to_search, query, kwargs)
+            query_response = SOLR.query(core_to_search, new_query, **new_kwargs)
+            if 'error' in query_response:
+                sleuth_error = SleuthError(
+                    ErrorTypes.SOLR_SEARCH_ERROR,
+                    message=query_response['error']['msg']+" on core "+core_to_search
+                )
+                return HttpResponse(sleuth_error.json(), status=query_response['error']['code'])
+            
+            # Attach type to response and flatten single-item list fields
             query_response['type'] = core_to_search
+            for doc in query_response['response']['docs']:
+                for f in return_fields_list:
+                    try:
+                        doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
+                    except KeyError:
+                        pass
+
             responses['data'].append(query_response)
 
         # Handle errors and exceptions from each query
@@ -120,16 +140,16 @@ def search(request):
         except ValueError as v_e:
             sleuth_error = SleuthError(ErrorTypes.SOLR_CONNECTION_ERROR, str(v_e))
             return HttpResponse(sleuth_error.json(), status=500)
-        if 'error' in query_response:
-            sleuth_error = SleuthError(
-                ErrorTypes.SOLR_SEARCH_ERROR,
-                message=query_response['error']['msg']
-            )
-            return HttpResponse(sleuth_error.json(), status=query_response['error']['code'])
 
+    responses['request'] = {
+        'query': query,
+        'types': cores_to_search,
+        'return_fields': return_fields_list,
+        'state': state
+    }
     return HttpResponse(pysolr.force_unicode(responses))
 
-def _build_search_query(core, query_str, kwargs):
+def _build_search_query(core, query_str, base_kwargs):
     '''
     Builds a serach query and sets parameters that is most likely to
     return the best results for the given core using the given user query.
@@ -137,8 +157,9 @@ def _build_search_query(core, query_str, kwargs):
     See https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
     for more information about Apache Lucene query syntax.
     '''
+    kwargs = base_kwargs
 
-    if core == 'genericPage':
+    if core == "genericPage":
         fields = {
             'id': 1,
             'siteName': 10,
@@ -149,20 +170,18 @@ def _build_search_query(core, query_str, kwargs):
         query = Query(query_str, fields=fields, proximity=5)
         terms_query = Query(query_str, fields=fields, as_phrase=False)
         query.select_or(terms_query)
-        kwargs['default_field'] = 'description'
+        kwargs['default_field'] = 'content'
         kwargs['highlight_fields'] = 'content'
 
-    elif core == 'courseItem':
+    elif core == "courseItem":
         fields = {
             'id': 1,
-            'name': 10,
-            'description': 10,
+            'name': 9,
+            'description': 8,
             'subjectData': 5,
         }
-        query = Query(query_str, fields=fields, proximity=5)
-        terms_query = Query(query_str, fields=fields, as_phrase=False)
-        query.select_or(terms_query)
-        kwargs['default_field'] = 'description'
+        query = Query(query_str, fields=fields)
+        kwargs['default_field'] = 'name'
         kwargs['highlight_fields'] = 'description'
 
     else:
