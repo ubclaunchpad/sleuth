@@ -9,3 +9,4 @@ coverage
 coveralls
 scrapy
 bs4
+nltk

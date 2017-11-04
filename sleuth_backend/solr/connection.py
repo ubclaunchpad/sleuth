@@ -40,14 +40,13 @@ class SolrConnection(object):
         """
         Returns the schema of the core with the given name as a dictionary.
         """
-        response = self._get_url("{}/{}/schema".format(self.url, name))
-        body = json.loads(response)
+        response = self._get_url("{}/{}/schema".format(self.url, name), {})
 
-        if 'schema' not in body:
+        if 'schema' not in response:
             raise ValueError('Solr did not return a schema. Are you sure ' + \
                 'the core named "{}" is an existing core?'.format(name))
 
-        return body['schema']
+        return response['schema']
 
     def insert_document(self, core, doc):
         """
@@ -91,6 +90,7 @@ class SolrConnection(object):
             "wt": "json",
             "df": default_field,
             "omitHeader": "true" if omit_header else "false",
+            "hl.fragsize": 200
         }
         if sort is not "":
             params["sort"] = sort
@@ -106,7 +106,7 @@ class SolrConnection(object):
             params["hl"] = "on"
             params["hl.fl"] = highlight_fields
 
-        return self._get_url("{}/{}/select".format(self.url, core), params=params)
+        return self._get_url("{}/{}/select".format(self.url, core), params)
 
     def optimize(self, core_name=None):
         """
@@ -119,13 +119,13 @@ class SolrConnection(object):
             except KeyError as e:
                 raise KeyError('No Solr core with the name "{}" was found'.format(core_name))
         else:
-            for core in self.core_names():
+            for core in self.cores:
                 self.cores[core].optimize()
 
-    def _get_url(self, url, params={}):
+    def _get_url(self, url, params):
         """
         Makes a request to the given url relative to the base url with the given
         parameters and returns the response as a JSON string.
         """
         response = requests.get(url, params=pysolr.safe_urlencode(params))
-        return pysolr.force_unicode(response.content)
+        return response.json()

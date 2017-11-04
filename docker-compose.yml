@@ -17,7 +17,7 @@ services:
     ]
 
   web:
-    environment: 
+    environment:
      - PYTHONUNBUFFERED=1
     build:
       context: .
@@ -32,12 +32,12 @@ services:
       - solr
 
   frontend:
-    build: 
+    build:
       context: ../sleuth-frontend
-    command: sh -c "yarn && yarn start --host 0.0.0.0 --port 8080"
+    command: sh -c "yarn && yarn start --host 0.0.0.0 --port 8080 --inline --hot"
     volumes:
       - ../sleuth-frontend:/home/sleuth-frontend
-    ports: 
+    ports:
       - "8080:8080"
     depends_on:
       - web
