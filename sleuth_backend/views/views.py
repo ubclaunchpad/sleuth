@@ -123,10 +123,8 @@ def search(request):
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
                 for f in return_fields_list:
-                    try:
+                    if f in doc:
                         doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
-                    except KeyError:
-                        pass
 
             responses['data'].append(query_response)
 
