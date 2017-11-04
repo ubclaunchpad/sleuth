@@ -36,7 +36,7 @@ class TestSolrPipeline(TestCase):
         self.assertTrue(len(doc["children"])==2)
         self.assertTrue(doc["updatedAt"])
         print("Timestamp: " + doc["updatedAt"])
-        self.assertEqual("title", doc["pageName"])
+        self.assertEqual("title", doc["name"])
         self.assertEqual("site title", doc["siteName"])
 
     def test_process_course_item(self):

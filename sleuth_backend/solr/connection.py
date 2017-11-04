@@ -120,7 +120,7 @@ class SolrConnection(object):
             except KeyError as e:
                 raise KeyError('No Solr core with the name "{}" was found'.format(core_name))
         else:
-            for core in self.core_names():
+            for core in self.cores:
                 self.cores[core].optimize()
 
     def _get_url(self, url, params):
