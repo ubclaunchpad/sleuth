@@ -75,7 +75,7 @@ class TestAPI(TestCase):
         }
         params = {
             'q': 'somequery',
-            'core': 'test',
+            'core': 'genericPage',
             'return': 'content'
         }
         mock_request = MockRequest('GET', get=MockGet(params))
@@ -89,7 +89,7 @@ class TestAPI(TestCase):
             str({
                 'data':[mock_query.return_value],
                 'request':{
-                    'query':'somequery','types':['test'],
+                    'query':'somequery','types':['genericPage'],
                     'return_fields':['id','updatedAt','name','description','content'],
                     'state':''
                 }
@@ -139,6 +139,7 @@ class TestAPI(TestCase):
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_search_with_error_response(self, mock_query):
+        # Solr response error
         mock_query.return_value = {
             "error": {
                 "msg": "org.apache.solr.search.SyntaxError",
@@ -157,3 +158,21 @@ class TestAPI(TestCase):
         result = search(mock_request)
         self.assertEqual(result.status_code, 400)
         self.assertEqual(result.content.decode("utf-8"), expected_response)
+
+        # pysolr error
+        mock_query.side_effect = pysolr.SolrError()
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 400)
+
+        # Key error
+        mock_query.side_effect = KeyError()
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 500)
+
+        # Value error
+        mock_query.side_effect = ValueError()
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 500)
