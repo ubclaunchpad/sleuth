@@ -82,3 +82,10 @@ class TestQuery(TestCase):
         query.fuzz(2)
         self.assertEqual('"hello bruno"~2', str(query))
         self.failUnlessRaises(ValueError, query.fuzz, 7)
+
+    def test_sanitation(self):
+        '''
+        Test query init with sanitize=True
+        '''
+        query = Query("The quick brown fox jumped over 12 lazy dogs", sanitize=True)
+        print(str(query))

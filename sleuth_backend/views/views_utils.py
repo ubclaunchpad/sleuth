@@ -51,15 +51,16 @@ def build_search_query(core, query_str, base_kwargs):
     if core == "genericPage":
         fields = {
             'id': 1,
-            'siteName': 8,
             'name': 8,
+            'siteName': 5,
             'description': 5,
-            'content': 2
+            'content': 8
         }
         query = Query(query_str)
         query.fuzz(2)
-        terms_query = Query(query_str, as_phrase=False, escape=True)
-        terms_query.fuzz(2)
+        query.boost_importance(5)
+        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True)
+        terms_query.fuzz(1)
         terms_query.for_fields(fields)
         query.select_or(terms_query)
         kwargs['default_field'] = 'content'
@@ -74,7 +75,7 @@ def build_search_query(core, query_str, base_kwargs):
         }
         query = Query(query_str)
         query.fuzz(2)
-        terms_query = Query(query_str, as_phrase=False, escape=True)
+        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True)
         terms_query.for_fields(fields)
         query.select_or(terms_query)
         kwargs['default_field'] = 'name'

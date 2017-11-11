@@ -69,3 +69,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# nltk
+averaged_perceptron_tagger/

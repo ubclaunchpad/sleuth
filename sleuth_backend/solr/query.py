@@ -2,7 +2,7 @@
 Solr query assembling
 '''
 
-#import nltk
+import nltk
 
 class Query(object):
     """
@@ -13,6 +13,7 @@ class Query(object):
         query_str  (str): the desired query
         as_phrase (bool): should this query be formatted as a phrase (default=True)
         escape    (bool): should special characters be escaped from the phrase (default=False)
+        sanitize  (bool): should query be stripped of trivial words (default=False)
 
     Example Usage:
         my_query = Query(query_str)
@@ -21,15 +22,17 @@ class Query(object):
         return str(my_query)                # return query string
     """
 
-    def __init__(self, query_str, as_phrase=True, escape=False):
+    def __init__(self, query_str, as_phrase=True, escape=False, sanitize=False):
         """
         Initialize a query
         """
         self.query_str = query_str
-        self._sanitize()
 
         if escape:
             self._escape_special_chars()
+
+        if sanitize:
+            self._sanitize()
 
         if as_phrase:
             self._as_phrase()
@@ -111,12 +114,25 @@ class Query(object):
         self.query_str = '"{}"'.format(self.query_str)
 
     def _sanitize(self):
-        """
+        '''
         Trim nonessential words such as 'and', 'or', 'for'
-        """
-        # TODO: trim useless words like 'and', 'or', 'for' 
-        # from query if as_phrase is false using NLTK POS tagger
-        self.query_str = ' '.join(self.query_str.split())
+        Parts of Speech types:
+        http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+        '''
+        tags_to_keep = [
+            'NN', 'NNS', 'NNP', 'NNPS',       # noun types
+            'VB', 'VBG', 'VBN', 'VBP', 'VBZ', # verb types
+            'JJ', 'JJR', 'JJS',               # adjective types
+            'RB', 'RBR', 'RBS',               # adverbs
+        ]
+        words = nltk.word_tokenize(self.query_str)
+        words = nltk.pos_tag(words)
+        print(words)
+        words_list = []
+        for word in words:
+            if word[1] in tags_to_keep:
+                words_list.append(word[0])
+        self.query_str = ' '.join(words_list)
 
     def _escape_special_chars(self):
         '''
