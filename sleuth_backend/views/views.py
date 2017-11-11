@@ -120,8 +120,6 @@ def search(request):
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
                 flatten_doc(doc, return_fields)
-                if 'description' not in doc:
-                    doc['description'] = ''
 
             responses['data'].append(query_response)
 
@@ -165,7 +163,7 @@ def getdocument(request):
 
     kwargs = { 'return_fields': return_fields }
 
-    if id is '':
+    if doc_id is '':
         sleuth_error = SleuthError(ErrorTypes.INVALID_GETDOCUMENT_REQUEST)
         return HttpResponse(sleuth_error.json(), status=400)
 

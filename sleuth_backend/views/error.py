@@ -12,8 +12,10 @@ class ErrorTypes(Enum):
     SOLR_CONNECTION_ERROR = 1
     # Occurs when Solr returns an error response to a search query.
     SOLR_SEARCH_ERROR = 2
-    # Occurs when a search term or core name is missing from a search request.
+    # Occurs when a search term is missing from a search request.
     INVALID_SEARCH_REQUEST = 3
+    # Occurs when a id is missing from a getdocument request
+    INVALID_GETDOCUMENT_REQUEST = 4
 
 class SleuthError(Exception):
     '''

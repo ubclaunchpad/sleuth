@@ -34,6 +34,8 @@ def flatten_doc(doc, return_fields):
     for f in return_fields.split(","):
         if f in doc:
             doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
+        else:
+            doc[f] = ''
     return doc
 
 def build_search_query(core, query_str, base_kwargs):
@@ -49,13 +51,16 @@ def build_search_query(core, query_str, base_kwargs):
     if core == "genericPage":
         fields = {
             'id': 1,
-            'siteName': 10,
-            'name': 10,
+            'siteName': 8,
+            'name': 8,
             'description': 5,
             'content': 2
         }
-        query = Query(query_str, fields=fields, proximity=5)
-        terms_query = Query(query_str, fields=fields, as_phrase=False)
+        query = Query(query_str)
+        query.fuzz(2)
+        terms_query = Query(query_str, as_phrase=False, escape=True)
+        terms_query.fuzz(2)
+        terms_query.for_fields(fields)
         query.select_or(terms_query)
         kwargs['default_field'] = 'content'
         kwargs['highlight_fields'] = 'content'
@@ -67,7 +72,11 @@ def build_search_query(core, query_str, base_kwargs):
             'description': 8,
             'subjectData': 5,
         }
-        query = Query(query_str, fields=fields)
+        query = Query(query_str)
+        query.fuzz(2)
+        terms_query = Query(query_str, as_phrase=False, escape=True)
+        terms_query.for_fields(fields)
+        query.select_or(terms_query)
         kwargs['default_field'] = 'name'
         kwargs['highlight_fields'] = 'description'
 
@@ -82,7 +91,7 @@ def build_getdocument_query(doc_id, base_kwargs):
     the given doc_id
     '''
     kwargs = base_kwargs
-    query = Query(doc_id)
+    query = Query(doc_id, as_phrase=False, escape=True)
     query.for_single_field('id')
     kwargs['default_field'] = 'id'
     return (str(query), kwargs)

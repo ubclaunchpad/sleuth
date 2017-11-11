@@ -1,8 +1,8 @@
-#import nltk
+'''
+Solr query assembling
+'''
 
-"""
-Solr queries
-"""
+#import nltk
 
 class Query(object):
     """
@@ -10,11 +10,9 @@ class Query(object):
     See class for available query manipulations.
 
     Params:
-        query_str (str): the desired query
-        as_phrase (str): should this query be formatted as a phrase (default=True)
-        fields   (dict): the Solr fields to apply this query to (default=None) 
-        proximity (int): proximity for parts of the search phrase (default=None)
-                         only works if as_phrase=True
+        query_str  (str): the desired query
+        as_phrase (bool): should this query be formatted as a phrase (default=True)
+        escape    (bool): should special characters be escaped from the phrase (default=False)
 
     Example Usage:
         my_query = Query(query_str)
@@ -23,20 +21,18 @@ class Query(object):
         return str(my_query)                # return query string
     """
 
-    def __init__(self, query_str, as_phrase=True, fields=None, proximity=None):
+    def __init__(self, query_str, as_phrase=True, escape=False):
         """
         Initialize a query
         """
         self.query_str = query_str
         self._sanitize()
 
+        if escape:
+            self._escape_special_chars()
+
         if as_phrase:
-            self._as_phrase(proximity)
-        
-        if fields:
-            if type(fields) is not dict:
-                raise ValueError('Fields must be a dict of field names and boost factors')
-            self._for_fields(fields)
+            self._as_phrase()
 
     def __str__(self):
         """
@@ -74,11 +70,26 @@ class Query(object):
         Apply given field to query
         '''
         self.query_str = '{}:{}'.format(field, self.query_str)
-    
-    def _for_fields(self, fields):
+
+    def fuzz(self, factor):
+        '''
+        "Fuzzes" the query by a given factor >0 and <2.
+        Acts differently depending on whether the query is a phrase or not.
+        For phrases, this factor determines how far about the words of a
+        phrase can be found.
+        For terms, this factor determines how many insertions/deletions will
+        still return a match.
+        '''
+        if factor < 0 or factor > 2:
+            raise ValueError('Factor must be between 0 and 2.')
+        self.query_str = '{}~{}'.format(self.query_str, factor)
+
+    def for_fields(self, fields):
         """
         Apply given fields to query
         """
+        if type(fields) is not dict:
+            raise ValueError('Fields must be a dict of field names and boost factors')
         self._for_fields_helper(self.query_str, list(fields.items()))
 
     def _for_fields_helper(self, query_str, fields):
@@ -92,14 +103,12 @@ class Query(object):
         self.select_or(query)
         self._for_fields_helper(query_str, fields[1:])
 
-    def _as_phrase(self, proximity):
+    def _as_phrase(self):
         """
         Format query as entire phrase, and optionally set proximity for
         words within the phrase.
         """
         self.query_str = '"{}"'.format(self.query_str)
-        if proximity:
-            self.query_str = '{}~{}'.format(self.query_str, proximity)
 
     def _sanitize(self):
         """
@@ -108,3 +117,13 @@ class Query(object):
         # TODO: trim useless words like 'and', 'or', 'for' 
         # from query if as_phrase is false using NLTK POS tagger
         self.query_str = ' '.join(self.query_str.split())
+
+    def _escape_special_chars(self):
+        '''
+        Escape special characters that interfere with Solr's query parser.
+        Ideally only use on queries where as_phrase=False, since special
+        characters in phrases do not upset Solr.
+        '''
+        special_chars = ['!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '|', '&']
+        for c in special_chars:
+            self.query_str = self.query_str.replace(c, '\\'+c)
