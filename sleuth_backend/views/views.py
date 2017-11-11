@@ -3,9 +3,7 @@ Sleuth's Django API handlers
 '''
 
 import pysolr
-import re
 import json
-import sys
 from django.http import HttpResponse
 from .error import SleuthError, ErrorTypes
 from .views_utils import *
@@ -99,7 +97,13 @@ def search(request):
         return HttpResponse(sleuth_error.json(), status=400)
 
     responses = {
-        'data':[]
+        'data': [],
+        'request': {
+            'query': query,
+            'types': cores_to_search,
+            'return_fields': return_fields.split(","),
+            'state': state
+        }
     }
     for core_to_search in cores_to_search:
         try:
@@ -116,6 +120,8 @@ def search(request):
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
                 flatten_doc(doc, return_fields)
+                if 'description' not in doc:
+                    doc['description'] = ''
 
             responses['data'].append(query_response)
 
@@ -124,12 +130,6 @@ def search(request):
             message, status = build_error(e)
             return HttpResponse(message, status=status)
 
-    responses['request'] = {
-        'query': query,
-        'types': cores_to_search,
-        'return_fields': return_fields.split(","),
-        'state': state
-    }
     return HttpResponse(pysolr.force_unicode(responses))
 
 def getdocument(request):
@@ -189,6 +189,7 @@ def getdocument(request):
                 )
                 return HttpResponse(sleuth_error.json(), status=query_response['error']['code'])
             if query_response['response']['numFound'] != 0:
+                # Return result if a value is found
                 response['data'] = {
                     'type': core_to_search,
                     'doc': flatten_doc(query_response['response']['docs'][0], return_fields)
@@ -198,9 +199,9 @@ def getdocument(request):
         # Handle errors and exceptions from each query
         except (Exception, pysolr.SolrError) as e:
             message, status = build_error(e)
-            print(message + " " + str(status))
             return HttpResponse(message, status=status)
 
+    # Default return value
     response['data'] = {
         'type': '',
         'doc': {}

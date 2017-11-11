@@ -30,7 +30,7 @@ class TestAPI(TestCase):
         self.assertEqual(result.status_code, 405)
 
     @patch('sleuth_backend.solr.connection.SolrConnection.core_names')
-    def test_cores_without_get(self, mock_core_names):
+    def test_cores_with_get(self, mock_core_names):
         mock_core_names.return_value = ['core1', 'core2']
         mock_request = MockRequest('GET')
         result = cores(mock_request)
@@ -38,10 +38,12 @@ class TestAPI(TestCase):
         self.assertEqual(result.content, b'["core1", "core2"]')
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
-    def test_search_without_get(self, mock_query):
+    def test_apis_without_get(self, mock_query):
         mock_query.return_value = {}
         mock_request = MockRequest('POST')
         result = search(mock_request)
+        self.assertEqual(result.status_code, 405)
+        result = getdocument(mock_request)
         self.assertEqual(result.status_code, 405)
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
@@ -158,11 +160,16 @@ class TestAPI(TestCase):
         result = search(mock_request)
         self.assertEqual(result.status_code, 400)
         self.assertEqual(result.content.decode("utf-8"), expected_response)
+        result = getdocument(mock_request)
+        self.assertEqual(result.status_code, 400)
+        self.assertEqual(result.content.decode("utf-8"), expected_response)
 
         # pysolr error
         mock_query.side_effect = pysolr.SolrError()
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
+        self.assertEqual(result.status_code, 400)
+        result = getdocument(mock_request)
         self.assertEqual(result.status_code, 400)
 
         # Key error
@@ -170,11 +177,15 @@ class TestAPI(TestCase):
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
         self.assertEqual(result.status_code, 500)
+        result = getdocument(mock_request)
+        self.assertEqual(result.status_code, 500)
 
         # Value error
         mock_query.side_effect = ValueError()
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
+        self.assertEqual(result.status_code, 500)
+        result = getdocument(mock_request)
         self.assertEqual(result.status_code, 500)
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
