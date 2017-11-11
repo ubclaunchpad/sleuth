@@ -1,5 +1,5 @@
 '''
-Sleuth's Django API
+Sleuth's Django API handlers
 '''
 
 import pysolr
@@ -33,13 +33,13 @@ def search(request):
     connected Solr instance.
 
     Params:
-        type: (optional) the name of the core to search in - all cores by default
         q: the term or phrase to search for
-        sort: see Solr docs for sort syntax
-        start: the index of the first result to return
-        rows: the number of results to return starting from the start index
-        return: the desired return fields - see sleuth_backend.solr.models
-        state: any string to be returned in response
+        type: (optional) the name of the core to search in - all cores by default
+        sort: (optional) see Solr docs for sort syntax
+        start: (optional) the index of the first result to return
+        rows: (optional) the number of results to return starting from the start index
+        return: (optional) the desired return fields - see sleuth_backend.solr.models
+        state: (optional) any string to be returned in response
 
     Example Usage:
     http:// ... /api/search/?q=hello&core=genericPage&return=children
@@ -120,15 +120,9 @@ def search(request):
             responses['data'].append(query_response)
 
         # Handle errors and exceptions from each query
-        except pysolr.SolrError as s_e:
-            sleuth_error = SleuthError(ErrorTypes.SOLR_SEARCH_ERROR, str(s_e))
-            return HttpResponse(sleuth_error.json(), status=400)
-        except KeyError as k_e:
-            sleuth_error = SleuthError(ErrorTypes.UNEXPECTED_SERVER_ERROR, str(k_e))
-            return HttpResponse(sleuth_error.json(), status=500)
-        except ValueError as v_e:
-            sleuth_error = SleuthError(ErrorTypes.SOLR_CONNECTION_ERROR, str(v_e))
-            return HttpResponse(sleuth_error.json(), status=500)
+        except (Exception, pysolr.SolrError) as e:
+            message, status = build_error(e)
+            return HttpResponse(message, status=status)
 
     responses['request'] = {
         'query': query,
@@ -137,3 +131,78 @@ def search(request):
         'state': state
     }
     return HttpResponse(pysolr.force_unicode(responses))
+
+def getdocument(request):
+    '''
+    Takes GET request containing an ID URL and returns the associated
+    document from Solr database.
+
+    Params:
+        id: the id to search for and retrieve
+        type: (optional) the name of the core to look for the ID in - all cores by default
+        return: (optional) the desired return fields - see sleuth_backend.solr.models
+        state: (optional) any string to be returned in response
+
+    Example Usage:
+    http:// ... /api/get/?id=https://www.ubc.ca&return=children
+
+    Example Response Body:
+    {
+        "data": {
+            "type": <core name>,
+            "doc": { <document format depends on core> }
+        },
+        "request": { <data about your original request> }
+    }
+    '''
+    if request.method != 'GET':
+        return HttpResponse(status=405)
+
+    cores_to_search = build_core_request(request.GET.get('type', ''), SOLR.core_names())
+    doc_id = request.GET.get('id', '')
+    state = request.GET.get('state', '')
+    return_fields = build_return_fields(request.GET.get('return', ''))
+
+    kwargs = { 'return_fields': return_fields }
+
+    if id is '':
+        sleuth_error = SleuthError(ErrorTypes.INVALID_GETDOCUMENT_REQUEST)
+        return HttpResponse(sleuth_error.json(), status=400)
+
+    response = {
+        'data': {},
+        'request': {
+            'query': doc_id,
+            'types': cores_to_search,
+            'return_fields': return_fields.split(","),
+            'state': state
+        }
+    }
+    for core_to_search in cores_to_search:
+        try:
+            new_query, new_kwargs = build_getdocument_query(doc_id, kwargs)
+            query_response = SOLR.query(core_to_search, new_query, **new_kwargs)
+            if 'error' in query_response:
+                sleuth_error = SleuthError(
+                    ErrorTypes.SOLR_SEARCH_ERROR,
+                    message=query_response['error']['msg']+" on core "+core_to_search
+                )
+                return HttpResponse(sleuth_error.json(), status=query_response['error']['code'])
+            if query_response['response']['numFound'] != 0:
+                response['data'] = {
+                    'type': core_to_search,
+                    'doc': flatten_doc(query_response['response']['docs'][0], return_fields)
+                }
+                return HttpResponse(pysolr.force_unicode(response))
+
+        # Handle errors and exceptions from each query
+        except (Exception, pysolr.SolrError) as e:
+            message, status = build_error(e)
+            print(message + " " + str(status))
+            return HttpResponse(message, status=status)
+
+    response['data'] = {
+        'type': '',
+        'doc': {}
+    }
+    return HttpResponse(pysolr.force_unicode(response))

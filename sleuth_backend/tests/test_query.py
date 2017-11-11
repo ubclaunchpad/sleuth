@@ -66,3 +66,11 @@ class TestQuery(TestCase):
         terms = ["hack", "wack"]
         query1.select_require(terms)
         self.assertEqual('"hello bruno"+hack+wack', str(query1))
+
+    def test_for_single_field(self):
+        '''
+        Test applying a single field to a query
+        '''
+        query = Query("hello bruno")
+        query.for_single_field('id')
+        self.assertEqual('id:"hello bruno"', str(query))

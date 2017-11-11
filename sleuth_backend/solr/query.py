@@ -68,6 +68,12 @@ class Query(object):
         """
         for term in terms:
             self.query_str += '+{}'.format(term)
+
+    def for_single_field(self, field):
+        '''
+        Apply given field to query
+        '''
+        self.query_str = '{}:{}'.format(field, self.query_str)
     
     def _for_fields(self, fields):
         """

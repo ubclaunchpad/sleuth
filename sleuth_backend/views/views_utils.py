@@ -2,6 +2,8 @@
 Helper methods for Django views
 '''
 
+from pysolr import SolrError
+from .error import SleuthError, ErrorTypes
 from sleuth_backend.solr.query import Query
 
 def build_core_request(core, solr_cores):
@@ -73,3 +75,28 @@ def build_search_query(core, query_str, base_kwargs):
         query = Query(query_str)
 
     return (str(query), kwargs)
+
+def build_getdocument_query(doc_id, base_kwargs):
+    '''
+    Builds a query and sets parameters to find the document associated with
+    the given doc_id
+    '''
+    kwargs = base_kwargs
+    query = Query(doc_id)
+    query.for_single_field('id')
+    kwargs['default_field'] = 'id'
+    return (str(query), kwargs)
+
+def build_error(err):
+    '''
+    Builds appropriate error and response status for given Exception
+    '''
+    if isinstance(err, SolrError):
+        sleuth_error = SleuthError(ErrorTypes.SOLR_SEARCH_ERROR, str(err))
+        return sleuth_error.json(), 400
+    elif isinstance(err, KeyError):
+        sleuth_error = SleuthError(ErrorTypes.UNEXPECTED_SERVER_ERROR, str(err))
+        return sleuth_error.json(), 500
+    elif isinstance(err, ValueError):
+        sleuth_error = SleuthError(ErrorTypes.SOLR_CONNECTION_ERROR, str(err))
+        return sleuth_error.json(), 500

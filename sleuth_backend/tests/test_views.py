@@ -3,7 +3,7 @@ import pysolr
 from django.test import TestCase
 from django.http import HttpResponse
 from unittest.mock import MagicMock, patch
-from sleuth_backend.views.views import cores, search
+from sleuth_backend.views.views import cores, search, getdocument
 
 class MockGet(object):
 
@@ -176,3 +176,33 @@ class TestAPI(TestCase):
         mock_request = MockRequest('GET', get=MockGet(params))
         result = search(mock_request)
         self.assertEqual(result.status_code, 500)
+
+    @patch('sleuth_backend.solr.connection.SolrConnection.query')
+    def test_getdocument_with_valid_request(self, mock_query):
+        mock_query.return_value = {
+            "type": "genericPage",
+            "response": {
+                "numFound": 1,
+                "start": 0,
+                "docs": [{"id": ["www.cool.com"],"description": ["Nice one dude"],}]
+            },
+            "highlighting": {
+                "www.cool.com": { "content": ['Nice one dude'] }
+            }
+        }
+        params = {
+            'q': 'somequery',
+            'type': 'genericPage',
+            'return': 'content'
+        }
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = getdocument(mock_request)
+        self.assertEqual(result.status_code, 200)
+
+        self.assertEqual(
+            result.content.decode("utf-8"),
+            str({
+                'data': {'type': 'genericPage', 'doc': {'id': 'www.cool.com', 'description': 'Nice one dude'}},
+                'request': {'query': '', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}
+            })
+        )
