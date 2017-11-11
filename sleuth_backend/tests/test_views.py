@@ -75,7 +75,7 @@ class TestAPI(TestCase):
         }
         params = {
             'q': 'somequery',
-            'core': 'genericPage',
+            'type': 'genericPage',
             'return': 'content'
         }
         mock_request = MockRequest('GET', get=MockGet(params))
@@ -148,7 +148,7 @@ class TestAPI(TestCase):
         }
         params = {
             'q': 'somequery',
-            'core': 'test',
+            'type': 'test',
         }
         expected_response = json.dumps({
             "message": "org.apache.solr.search.SyntaxError on core test",

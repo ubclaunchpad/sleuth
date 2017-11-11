@@ -1,12 +1,16 @@
+'''
+Sleuth's Django API
+'''
+
 import pysolr
 import re
 import json
 import sys
 from django.http import HttpResponse
 from .error import SleuthError, ErrorTypes
+from .views_utils import *
 from sleuth_backend.solr import connection as solr
 from sleuth.settings import HAYSTACK_CONNECTIONS
-from sleuth_backend.solr.query import Query
 
 SOLR = solr.SolrConnection(HAYSTACK_CONNECTIONS['default']['URL'])
 DEFAULT_CORE = "test"
@@ -29,7 +33,7 @@ def search(request):
     connected Solr instance.
 
     Params:
-        core: (optional) the name of the core to search in - all cores by default
+        type: (optional) the name of the core to search in - all cores by default
         q: the term or phrase to search for
         sort: see Solr docs for sort syntax
         start: the index of the first result to return
@@ -78,14 +82,11 @@ def search(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    core = request.GET.get('core', '')
+    cores_to_search = build_core_request(request.GET.get('type', ''), SOLR.core_names())
     query = request.GET.get('q', '')
     state = request.GET.get('state', '')
+    return_fields = build_return_fields(request.GET.get('return', ''))
 
-    return_fields = 'id,updatedAt,name,description'
-    requested_return_fields = request.GET.get('return', '')
-    if requested_return_fields is not '':
-        return_fields = return_fields + ',' + requested_return_fields
     kwargs = {
         'sort': request.GET.get('sort', ''),
         'start': request.GET.get('start', ''),
@@ -97,20 +98,12 @@ def search(request):
         sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST)
         return HttpResponse(sleuth_error.json(), status=400)
 
-    cores_to_search = []
-    if core is '':
-        for c in SOLR.core_names():
-            cores_to_search.append(c)
-    else:
-        cores_to_search.append(core)
-
-    return_fields_list = return_fields.split(",")
     responses = {
         'data':[]
     }
     for core_to_search in cores_to_search:
         try:
-            new_query, new_kwargs = _build_search_query(core_to_search, query, kwargs)
+            new_query, new_kwargs = build_search_query(core_to_search, query, kwargs)
             query_response = SOLR.query(core_to_search, new_query, **new_kwargs)
             if 'error' in query_response:
                 sleuth_error = SleuthError(
@@ -122,9 +115,7 @@ def search(request):
             # Attach type to response and flatten single-item list fields
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
-                for f in return_fields_list:
-                    if f in doc:
-                        doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
+                flatten_doc(doc, return_fields)
 
             responses['data'].append(query_response)
 
@@ -142,47 +133,7 @@ def search(request):
     responses['request'] = {
         'query': query,
         'types': cores_to_search,
-        'return_fields': return_fields_list,
+        'return_fields': return_fields.split(","),
         'state': state
     }
     return HttpResponse(pysolr.force_unicode(responses))
-
-def _build_search_query(core, query_str, base_kwargs):
-    '''
-    Builds a serach query and sets parameters that is most likely to
-    return the best results for the given core using the given user query.
-    
-    See https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
-    for more information about Apache Lucene query syntax.
-    '''
-    kwargs = base_kwargs
-
-    if core == "genericPage":
-        fields = {
-            'id': 1,
-            'siteName': 10,
-            'name': 10,
-            'description': 5,
-            'content': 2
-        }
-        query = Query(query_str, fields=fields, proximity=5)
-        terms_query = Query(query_str, fields=fields, as_phrase=False)
-        query.select_or(terms_query)
-        kwargs['default_field'] = 'content'
-        kwargs['highlight_fields'] = 'content'
-
-    elif core == "courseItem":
-        fields = {
-            'id': 1,
-            'name': 9,
-            'description': 8,
-            'subjectData': 5,
-        }
-        query = Query(query_str, fields=fields)
-        kwargs['default_field'] = 'name'
-        kwargs['highlight_fields'] = 'description'
-
-    else:
-        query = Query(query_str)
-
-    return (str(query), kwargs)
