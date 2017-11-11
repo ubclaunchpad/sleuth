@@ -94,15 +94,12 @@ class TestAPI(TestCase):
         mock_response['response']['docs'][0]['name'] = ''
         mock_response['response']['docs'][0]['description'] = 'Nice one dude'
         self.assertEqual(
-            result.content.decode("utf-8"), 
-            str({
-                'data':[mock_response],
-                'request':{
-                    'query':'somequery','types':['genericPage'],
-                    'return_fields':['id','updatedAt','name','description','content'],
-                    'state':''
-                }
-            })
+            json.loads(result.content.decode('utf-8')),
+            {
+                "data": [{"type": "genericPage", "response": {"numFound": 1, "start": 0, "docs": [{"id": "www.cool.com", "description": "Nice one dude", "updatedAt": "", "name": "", "content": ""}]},
+                          "highlighting": {"www.cool.com": {"content": ["Nice one dude"]}}}],
+                "request": {"query": "somequery", "types": ["genericPage"], "return_fields": ["id", "updatedAt", "name", "description", "content"], "state": ""}
+            }
         )
 
         # multicore search
@@ -112,11 +109,11 @@ class TestAPI(TestCase):
         result = search(mock_request)
         self.assertEqual(result.status_code, 200)
         self.assertEqual(
-            result.content.decode("utf-8"), 
-            str({'data': [{'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [{'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}, {'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [
-                {'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}], 'request': {'query': 'somequery', 'types': ['courseItem', 'courseItem'], 'return_fields': ['id', 'updatedAt', 'name', 'description'], 'state': ''}})
+            json.loads(result.content.decode('utf-8')), 
+            {'data': [{'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [{'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}, {'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [
+            {'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}], 'request': {'query': 'somequery', 'types': ['courseItem', 'courseItem'], 'return_fields': ['id', 'updatedAt', 'name', 'description'], 'state': ''}}
         )
-
+        
         # getdocument
         params = {
             'id': 'somequery',
@@ -127,9 +124,9 @@ class TestAPI(TestCase):
         result = getdocument(mock_request)
         self.assertEqual(result.status_code, 200)
         self.assertEqual(
-            result.content.decode("utf-8"),
-            str({'data': {'type': 'genericPage', 'doc': {'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}}, 'request': {
-                'query': 'somequery', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}})
+            json.loads(result.content.decode('utf-8')),
+            {'data': {'type': 'genericPage', 'doc': {'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}}, 'request': {
+            'query': 'somequery', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}}
         )
 
         mock_query.return_value['response']['numFound'] = 0
@@ -137,10 +134,9 @@ class TestAPI(TestCase):
         result = getdocument(mock_request)
         self.assertEqual(result.status_code, 200)
         self.assertEqual(
-            result.content.decode("utf-8"),
-            str({
-                'data': {'type': '', 'doc': {}}, 'request': {'query': 'somequery', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}
-            })
+            json.loads(result.content.decode('utf-8')),
+            {'data': {'type': '', 'doc': {}}, 
+            'request': {'query': 'somequery', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}}
         )
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')

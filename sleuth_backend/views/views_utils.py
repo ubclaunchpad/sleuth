@@ -93,6 +93,14 @@ def build_getdocument_query(doc_id, base_kwargs):
     kwargs = base_kwargs
     query = Query(doc_id, as_phrase=False, escape=True)
     query.for_single_field('id')
+    # Accomodate extra slash at end of ID query
+    query_variation = Query(doc_id + '/', as_phrase=False, escape=True)
+    query_variation.for_single_field('id')
+    query.select_or(query_variation)
+    # Accomodate lack of slash at end of ID query
+    query_variation = Query(doc_id.rstrip('/'), as_phrase=False, escape=True)
+    query_variation.for_single_field('id')
+    query.select_or(query_variation)
     kwargs['default_field'] = 'id'
     return (str(query), kwargs)
 

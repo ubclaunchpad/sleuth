@@ -4,7 +4,7 @@ Sleuth's Django API handlers
 
 import pysolr
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .error import SleuthError, ErrorTypes
 from .views_utils import *
 from sleuth_backend.solr import connection as solr
@@ -128,7 +128,7 @@ def search(request):
             message, status = build_error(e)
             return HttpResponse(message, status=status)
 
-    return HttpResponse(pysolr.force_unicode(responses))
+    return JsonResponse(responses)
 
 def getdocument(request):
     '''
@@ -192,7 +192,7 @@ def getdocument(request):
                     'type': core_to_search,
                     'doc': flatten_doc(query_response['response']['docs'][0], return_fields)
                 }
-                return HttpResponse(pysolr.force_unicode(response))
+                return JsonResponse(response)
 
         # Handle errors and exceptions from each query
         except (Exception, pysolr.SolrError) as e:
@@ -204,4 +204,4 @@ def getdocument(request):
         'type': '',
         'doc': {}
     }
-    return HttpResponse(pysolr.force_unicode(response))
+    return JsonResponse(response)
