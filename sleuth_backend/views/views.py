@@ -142,7 +142,7 @@ def getdocument(request):
         state: (optional) any string to be returned in response
 
     Example Usage:
-    http:// ... /api/get/?id=https://www.ubc.ca&return=children
+    http:// ... /api/get/?id=https://www.ubc.ca&return=links
 
     Example Response Body:
     {

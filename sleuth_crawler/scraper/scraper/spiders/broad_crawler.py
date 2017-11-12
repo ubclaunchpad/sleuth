@@ -48,7 +48,8 @@ class BroadCrawler(CrawlSpider):
         """
         Points to generic_page_parser (the default parser for this crawler)
         """
-        children = []
+        links = []
         for link in self.GENERIC_LINK_EXTRACTOR.extract_links(response):
-            children.append(link.url)
-        return generic_page_parser.parse_generic_item(response, children)
+            if link.url != response.url:
+                links.append(link.url)
+        return generic_page_parser.parse_generic_item(response, links)

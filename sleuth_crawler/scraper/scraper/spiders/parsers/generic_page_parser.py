@@ -3,7 +3,7 @@ import re
 from sleuth_crawler.scraper.scraper.spiders.parsers import utils
 from sleuth_crawler.scraper.scraper.items import ScrapyGenericPage
 
-def parse_generic_item(response, children=None):
+def parse_generic_item(response, links):
     """
     Scrape generic page
     """
@@ -25,6 +25,6 @@ def parse_generic_item(response, children=None):
         site_title=site_title,
         description=desc,
         raw_content=raw_content,
-        children=children if children else []
+        links=links
     )
     

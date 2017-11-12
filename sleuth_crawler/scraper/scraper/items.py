@@ -16,7 +16,7 @@ class ScrapyGenericPage(scrapy.Item):
     site_title = scrapy.Field()
     description = scrapy.Field()
     raw_content = scrapy.Field()
-    children = scrapy.Field()
+    links = scrapy.Field()
 
 class ScrapyCourseItem(scrapy.Item):
     """

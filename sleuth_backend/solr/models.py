@@ -52,7 +52,7 @@ class GenericPage(SolrDocument):
         "siteName": "",
         "description": "",
         "content": "",
-        "children": []
+        "links": []
     }
 
     def __init__(self, **kwargs):

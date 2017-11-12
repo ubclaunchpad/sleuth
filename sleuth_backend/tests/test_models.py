@@ -16,7 +16,7 @@ class TestModels(TestCase):
                 "siteName": "testsite",
                 "content": "testcontent",
                 "description": "testblurb",
-                "children": []
+                "links": []
             }
             return (args, GenericPage(**args))
         if t == "courseItem":

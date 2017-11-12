@@ -23,7 +23,7 @@ class TestSolrPipeline(TestCase):
             site_title="site title",
             description="",
             raw_content=["description1","description2"],
-            children=["www.google.com","www.reddit.com"]
+            links=["www.google.com","www.reddit.com"]
         )
         self.pipeline.process_item(item)
 
@@ -33,7 +33,7 @@ class TestSolrPipeline(TestCase):
         self.assertEqual("genericPage", doc_type)
         self.assertEqual("http://www.ubc.ca", doc["id"])
         self.assertEqual("description1 description2", doc["content"])
-        self.assertTrue(len(doc["children"])==2)
+        self.assertTrue(len(doc["links"])==2)
         self.assertTrue(doc["updatedAt"])
         print("Timestamp: " + doc["updatedAt"])
         self.assertEqual("title", doc["name"])
@@ -56,7 +56,6 @@ class TestSolrPipeline(TestCase):
         doc = args[1]
         self.assertEqual("courseItem", doc_type)
         self.assertEqual("subject.url", doc["id"])
-        #TODO
 
     def test_close_spider(self):
         """
