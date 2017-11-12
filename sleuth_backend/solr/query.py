@@ -76,7 +76,7 @@ class Query(object):
 
     def fuzz(self, factor):
         '''
-        "Fuzzes" the query by a given factor >0 and <2.
+        "Fuzzes" the query by a given factor where 0 <= factor <=2.
         Acts differently depending on whether the query is a phrase or not.
         For phrases, this factor determines how far about the words of a
         phrase can be found.
@@ -125,13 +125,12 @@ class Query(object):
             'JJ', 'JJR', 'JJS',               # adjective types
             'RB', 'RBR', 'RBS',               # adverbs
         ]
-        words = nltk.word_tokenize(self.query_str)
-        words = nltk.pos_tag(words)
-        print(words)
+        tokens = nltk.word_tokenize(self.query_str)
+        tags = nltk.pos_tag(tokens)
         words_list = []
-        for word in words:
-            if word[1] in tags_to_keep:
-                words_list.append(word[0])
+        for tag in tags:
+            if tag[1] in tags_to_keep:
+                words_list.append(tag[0])
         self.query_str = ' '.join(words_list)
 
     def _escape_special_chars(self):

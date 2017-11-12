@@ -10,13 +10,7 @@ def build_core_request(core, solr_cores):
     '''
     Builds a list of cores to search based on given core parameter
     '''
-    cores_to_search = []
-    if core is '':
-        for c in solr_cores:
-            cores_to_search.append(c)
-    else:
-        cores_to_search.append(core)
-    return cores_to_search
+    return [c for c in solr_cores] if core is '' else [core]
 
 def build_return_fields(fields):
     '''
