@@ -132,12 +132,7 @@ class TestAPI(TestCase):
         mock_query.return_value['response']['numFound'] = 0
         mock_request = MockRequest('GET', get=MockGet(params))
         result = getdocument(mock_request)
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(
-            json.loads(result.content.decode('utf-8')),
-            {'data': {'type': '', 'doc': {}}, 
-            'request': {'query': 'somequery', 'types': ['genericPage'], 'return_fields': ['id', 'updatedAt', 'name', 'description', 'content'], 'state': ''}}
-        )
+        self.assertEqual(result.status_code, 404)
 
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_apis_with_error_response(self, mock_query):

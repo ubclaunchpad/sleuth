@@ -199,9 +199,4 @@ def getdocument(request):
             message, status = build_error(e)
             return HttpResponse(message, status=status)
 
-    # Default return value
-    response['data'] = {
-        'type': '',
-        'doc': {}
-    }
-    return JsonResponse(response)
+    return HttpResponse("Document not found", status=404)
