@@ -40,7 +40,7 @@ def build_search_query(core, query_str, base_kwargs):
     See https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
     for more information about Apache Lucene query syntax.
     '''
-    kwargs = base_kwargs
+    kwargs = base_kwargs.copy()
 
     if core == "genericPage":
         fields = {
@@ -85,7 +85,7 @@ def build_getdocument_query(doc_id, base_kwargs):
     Builds a query and sets parameters to find the document associated with
     the given doc_id
     '''
-    kwargs = base_kwargs
+    kwargs = base_kwargs.copy()
     query = Query(doc_id, as_phrase=False, escape=True)
     query.for_single_field('id')
     # Accomodate extra slash at end of ID query
