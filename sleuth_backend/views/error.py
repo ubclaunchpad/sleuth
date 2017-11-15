@@ -12,8 +12,10 @@ class ErrorTypes(Enum):
     SOLR_CONNECTION_ERROR = 1
     # Occurs when Solr returns an error response to a search query.
     SOLR_SEARCH_ERROR = 2
-    # Occurs when a search term or core name is missing from a search request.
+    # Occurs when a search term is missing from a search request.
     INVALID_SEARCH_REQUEST = 3
+    # Occurs when a id is missing from a getdocument request
+    INVALID_GETDOCUMENT_REQUEST = 4
 
 class SleuthError(Exception):
     '''
@@ -41,7 +43,9 @@ class SleuthError(Exception):
         elif error_type is ErrorTypes.SOLR_SEARCH_ERROR:
             self.message = 'Solr returned an error response to the search query.'
         elif error_type is ErrorTypes.INVALID_SEARCH_REQUEST:
-            self.message = 'Must supply a search term with the parameters "q" and "core".'
+            self.message = 'Must supply a search term with the parameter "q".'
+        elif error_type is ErrorTypes.INVALID_GETDOCUMENT_REQUEST:
+            self.message = 'Must supply an ID (url) with the parameter "id".'
         else:
             raise ValueError('Invalid error type. Must be on of ErrorTypes.')
 

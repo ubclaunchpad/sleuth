@@ -48,7 +48,7 @@ class SolrPipeline(object):
             updatedAt=self.__make_date(),
             content=self.__parse_content(item["raw_content"]),
             description=item["description"],
-            children=item["children"]
+            links=item["links"]
         )
         solr_doc.save_to_solr(self.solr_connection)
 

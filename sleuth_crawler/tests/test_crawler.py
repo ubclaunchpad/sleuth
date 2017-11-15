@@ -3,7 +3,6 @@ from unittest.mock import patch
 from sleuth_crawler.tests.mocks import mock_response
 from sleuth_crawler.scraper.scraper.spiders.broad_crawler import *
 from sleuth_crawler.scraper.scraper.items import *
-import re
 
 class TestBroadCralwer(TestCase):
     """
@@ -45,3 +44,5 @@ class TestBroadCralwer(TestCase):
         response = mock_response(file_name='/test_data/ubc.txt')
         self.spider.parse_generic_item(response)
         self.assertTrue(fake_parser.called)
+        links_arg = fake_parser.call_args[1]
+        self.assertFalse('http://www.ubc.ca' in links_arg)

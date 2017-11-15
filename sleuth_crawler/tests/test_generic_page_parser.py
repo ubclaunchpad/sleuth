@@ -15,14 +15,14 @@ class TestGenericPageParser(TestCase):
         Test single item parse
         """
         response = mock_response('/test_data/ubc.txt', 'http://www.ubc.ca')
-        children = ['http://www.google.com', 'http://www.reddit.com']
-        item = parser.parse_generic_item(response, children)
+        links = ['http://www.google.com', 'http://www.reddit.com']
+        item = parser.parse_generic_item(response, links)
         item = ScrapyGenericPage(item)
         self.assertEqual(item['url'], "http://www.ubc.ca")
         self.assertTrue(len(item['raw_content']) > 0)
-        self.assertTrue(len(item['children']) > 0)
+        self.assertTrue(len(item['links']) > 0)
         self.assertEqual(item['description'], "The University of British Columbia is a global centre for research and teaching, consistently ranked among the top 20 public universities in the world.")
-        self.assertEqual(item['children'], children)
+        self.assertEqual(item['links'], links)
         self.assertEqual(item['title'], "Homepage")
         self.assertEqual(item['site_title'], "The University of British Columbia")
 
@@ -39,9 +39,9 @@ class TestGenericPageParser(TestCase):
         Test how site_title is assembled from site Title element
         """
         response = mock_response('<title>Homepage - Subtitle 1 - Subtitle 2 - The University of British Columbia</title>')
-        item = ScrapyGenericPage(parser.parse_generic_item(response))
+        item = ScrapyGenericPage(parser.parse_generic_item(response, []))
         self.assertEqual(item['site_title'], "Subtitle 2 - The University of British Columbia")
 
         response = mock_response('<title>Engineering alumna gives back as a WiSE Mentor | Women in Science and Engineering</title>')
-        item = ScrapyGenericPage(parser.parse_generic_item(response))
+        item = ScrapyGenericPage(parser.parse_generic_item(response, []))
         self.assertEqual(item['site_title'], "Women in Science and Engineering")

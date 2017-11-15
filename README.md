@@ -19,11 +19,12 @@ Getting Started: [Docker](https://docs.docker.com/get-started/),
 
 ## Installation
 
+- Clone this repository and the [Sleuth frontend](https://github.com/ubclaunchpad/sleuth-frontend) into the same directory
 - Install Docker
 - Run
 
 ```Shell
-$ docker-compose up
+$ docker-compose up --build
 ```
 
 - Once containers have started you can `exec` into `bash` in your `web` container and configure a Django admin user.
@@ -43,6 +44,7 @@ root@57d91373cdca:/home/sleuth# python3 manage.py createsuperuser
 
 - The base url for your Django instance should be http://localhost:8000. 
 - To access the Django admin interface make sure you have completed the steps listed above and to go http://localhost:8000/admin.
+- To test the backend API, go to http://localhost:8000/api/[ENDPOINT]/?[PARAMS]
 
 ### Accessing the Sleuth Front-end App
 
@@ -66,7 +68,7 @@ $ bash cd sleuth_crawler/scraper && scrapy crawl broad_crawler
 
 At the moment the crawler never really seems to stop, so you will likely have to force it to quit when you have sufficient data entries.
 
-To empty the a core, go to:
+To empty a core, go to:
 ```
 http://localhost:8983/solr/[CORE_NAME_HERE]/update?stream.body=<delete><query>*:*</query></delete>&commit=true
 ```
