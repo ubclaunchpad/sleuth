@@ -50,13 +50,13 @@ def build_search_query(core, query_str, base_kwargs):
             'description': 5,
             'content': 8
         }
-        query = Query(query_str)
-        query.fuzz(2)
-        query.boost_importance(5)
-        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True)
-        terms_query.fuzz(1)
-        terms_query.for_fields(fields)
-        query.select_or(terms_query)
+        query = Query(query_str) \
+            .fuzz(2) \
+            .boost_importance(5)
+        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True) \
+            .fuzz(1) \
+            .for_fields(fields)
+        query = query.select_or(terms_query)
         kwargs['default_field'] = 'content'
         kwargs['highlight_fields'] = 'content'
 
@@ -67,11 +67,11 @@ def build_search_query(core, query_str, base_kwargs):
             'description': 8,
             'subjectData': 5,
         }
-        query = Query(query_str)
-        query.fuzz(2)
-        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True)
-        terms_query.for_fields(fields)
-        query.select_or(terms_query)
+        query = Query(query_str) \
+            .fuzz(2)
+        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True) \
+            .for_fields(fields)
+        query = query.select_or(terms_query)
         kwargs['default_field'] = 'name'
         kwargs['highlight_fields'] = 'description'
 
@@ -83,25 +83,24 @@ def build_search_query(core, query_str, base_kwargs):
 def build_getdocument_query(doc_id, base_kwargs):
     '''
     Builds a query and sets parameters to find the document associated with
-    the given doc_id
+    the given doc_id, allowing for a missing/extra trailing "/" on the doc_id
     '''
     kwargs = base_kwargs.copy()
-    query = Query(doc_id, as_phrase=False, escape=True)
-    query.for_single_field('id')
-    # Accomodate extra slash at end of ID query
-    query_variation = Query(doc_id + '/', as_phrase=False, escape=True)
-    query_variation.for_single_field('id')
-    query.select_or(query_variation)
-    # Accomodate lack of slash at end of ID query
-    query_variation = Query(doc_id.rstrip('/'), as_phrase=False, escape=True)
-    query_variation.for_single_field('id')
-    query.select_or(query_variation)
+    query = Query(doc_id, as_phrase=False, escape=True).for_single_field('id') \
+        .select_or(
+            Query(doc_id + '/', as_phrase=False, escape=True).for_single_field('id')
+        ) \
+        .select_or(
+            Query(doc_id.rstrip('/'), as_phrase=False, escape=True).for_single_field('id')
+        )
     kwargs['default_field'] = 'id'
     return (str(query), kwargs)
 
 def build_error(err):
     '''
-    Builds appropriate error and response status for given Exception
+    Builds appropriate error and response status for given Exception.
+    Used specifically in views for catching exceptions that could be thrown
+    by a Solr query
     '''
     if isinstance(err, SolrError):
         sleuth_error = SleuthError(ErrorTypes.SOLR_SEARCH_ERROR, str(err))
