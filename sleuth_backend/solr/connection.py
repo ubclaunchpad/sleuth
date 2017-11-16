@@ -31,10 +31,13 @@ class SolrConnection(object):
 
     def core_names(self):
         """
-        Returns a list of know cores in the Solr instance without making a
-        request to Solr.
+        Returns a list of known valid cores in the Solr instance without
+        making a request to Solr - this request excludes cores used for testing.
         """
-        return list(self.cores.keys())
+        valid_cores = list(self.cores.keys())
+        if 'test' in valid_cores:
+            valid_cores.remove('test')
+        return valid_cores
 
     def fetch_core_schema(self, name):
         """
