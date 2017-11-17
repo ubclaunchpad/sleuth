@@ -27,8 +27,7 @@ class TestQuery(TestCase):
         Test applying fields to a Query
         """
         fields = {'id':1, 'name':10}
-        query = Query("hello bruno")
-        query.for_fields(fields)
+        query = Query("hello bruno").for_fields(fields)
         self.assertEqual(
             '"hello bruno" OR id:("hello bruno")^1 OR name:("hello bruno")^10',
             str(query)
@@ -41,8 +40,7 @@ class TestQuery(TestCase):
         Test boosting the importance of a query
         """
         query_str = "hello bruno"
-        query = Query(query_str)
-        query.boost_importance(5)
+        query = Query(query_str).boost_importance(5)
         self.assertEqual('("hello bruno")^5', str(query))
 
     def test_selects(self):
@@ -52,34 +50,35 @@ class TestQuery(TestCase):
         # AND
         query1 = Query("hello bruno")
         query2 = Query("bye bruno")
-        query1.select_and(query2)
-        self.assertEqual('"hello bruno" AND "bye bruno"', str(query1))
+        combined_query = query1.select_and(query2)
+        self.assertEqual('"hello bruno" AND "bye bruno"', str(combined_query))
 
         # OR
         query1 = Query("hello bruno")
-        query1.select_or(query2)
-        self.assertEqual('"hello bruno" OR "bye bruno"', str(query1))
+        combined_query = query1.select_or(query2)
+        self.assertEqual('"hello bruno" OR "bye bruno"', str(combined_query))
 
         # REQUIRE
-        query1 = Query("hello bruno")
         terms = ["hack", "wack"]
-        query1.select_require(terms)
-        self.assertEqual('"hello bruno"+hack+wack', str(query1))
+        query = Query("hello bruno").select_require(terms)
+        self.assertEqual('"hello bruno"+hack+wack', str(query))
+        query = Query("hello bruno").select_require([])
+        self.assertEqual('"hello bruno"', str(query))
 
     def test_for_single_field(self):
         '''
         Test applying a single field to a query
         '''
-        query = Query("hello bruno")
-        query.for_single_field('id')
+        query = Query("hello bruno").for_single_field('id')
         self.assertEqual('id:"hello bruno"', str(query))
+        query = Query("hello bruno").for_single_field('')
+        self.assertEqual('"hello bruno"', str(query))
 
     def test_fuzz(self):
         '''
         Test applying a fuzz factor to a query
         '''
-        query = Query("hello bruno")
-        query.fuzz(2)
+        query = Query("hello bruno").fuzz(2)
         self.assertEqual('"hello bruno"~2', str(query))
         self.failUnlessRaises(ValueError, query.fuzz, 7)
 
@@ -89,3 +88,7 @@ class TestQuery(TestCase):
         '''
         query = Query("The quick brown fox jumped over 12 lazy dogs", sanitize=True)
         print(str(query))
+
+        # If query only contains garbage, should use original string
+        query = Query('and and but but', sanitize=True)
+        self.assertEqual('"and and but but"', str(query))
