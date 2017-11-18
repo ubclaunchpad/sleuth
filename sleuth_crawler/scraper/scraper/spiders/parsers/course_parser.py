@@ -26,6 +26,7 @@ def parse_subjects(response):
             yield scrapy.Request(
                 next_url,
                 callback=parse_course,
+                priority=100,
                 meta={'data':subject}
             )
 
@@ -51,6 +52,7 @@ def parse_course(response):
             yield scrapy.Request(
                 next_url,
                 callback=parse_course_details,
+                priority=100,
                 meta={'data':course}
             )
 

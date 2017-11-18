@@ -21,9 +21,9 @@ class TestUtils(TestCase):
         self.assertEqual(
             utils.strip_content(data2), ["blabla"]
         )
-        data_split_lines = "<body> line1 \n line2 \n line3 \n \n line4 </body>"
+        data_split_lines = "<body> line12345 \n line22345 \n line32345 \n \n line42345 </body>"
         self.assertEqual(
-            utils.strip_content(data_split_lines), ["line1", "line2", "line3", "line4"]
+            utils.strip_content(data_split_lines), ["line12345", "line22345", "line32345", "line42345"]
         )
         data_invalid = {}
         self.assertEqual(

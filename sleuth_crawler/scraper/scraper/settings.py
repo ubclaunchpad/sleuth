@@ -24,7 +24,8 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 # Place specific domains before www.ubc.ca
 PARENT_URLS = [
     'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0',
-    'http://www.ubc.ca',
+    'https://www.ubyssey.ca',
+    'https://www.ubc.ca',
 ]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

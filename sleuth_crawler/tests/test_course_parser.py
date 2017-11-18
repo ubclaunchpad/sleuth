@@ -5,15 +5,15 @@ from sleuth_crawler.scraper.scraper.spiders.parsers import course_parser as pars
 import re
 
 class TestCourseParser(TestCase):
-    """
+    '''
     Test GenericCourseParser
     parsers.course_oarser
-    """
+    '''
 
     def test_parse_subjects(self):
-        """
+        '''
         Test subjects parsing
-        """
+        '''
         response = mock_response('/test_data/subjects.txt', 'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0')
         output = list(parser.parse_subjects(response))
         expected_subjects = [
@@ -30,12 +30,13 @@ class TestCourseParser(TestCase):
         ]
         self.assertEquals(output[0].callback.__name__, parser.parse_course.__name__)
         self.assertEquals(output[0].meta['data'],expected_subjects[0])
+        self.assertEquals(output[0].priority, 100)
         self.assertEquals(output[1].meta['data'],expected_subjects[1])
 
     def test_parse_course(self):
-        """
+        '''
         Test courses parsing
-        """
+        '''
         response = mock_response(
             '/test_data/courses.txt', 
             'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=ASTR'
@@ -56,12 +57,13 @@ class TestCourseParser(TestCase):
         ]
         self.assertEquals(output[0].callback.__name__, parser.parse_course_details.__name__)
         self.assertEquals(output[0].meta['data'],expected_courses[0])
+        self.assertEquals(output[0].priority, 100)
         self.assertEquals(output[1].meta['data'],expected_courses[1])
 
     def test_parse_course_details(self):
-        """
+        '''
         Test course details parsing
-        """
+        '''
         response = mock_response('/test_data/course_details.txt', 'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=3&dept=ASTR&course=200')
         response.meta['data'] = ScrapyCourseItem(subject="",url="",name="")
         output = parser.parse_course_details(response)
