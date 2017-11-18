@@ -31,7 +31,7 @@ class SolrDocument(object):
         Submits the document to the given Solr connection. This method should not
         be overridden.
         """
-        solr_connection.insert_document(self.type(), self.doc)
+        solr_connection.insert_document(self.type(), self.doc.copy())
 
     def type(self):
         """

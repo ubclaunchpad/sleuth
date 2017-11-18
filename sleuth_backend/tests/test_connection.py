@@ -90,7 +90,43 @@ class TestSolrConnection(TestCase):
         solr_connection.cores["genericPage"] = MockSolr()
         doc = {"id": "testid"}
         response = solr_connection.insert_document("genericPage", doc)
-        self.assertEqual([doc], response)
+        self.assertEqual(None, response)
+
+        with self.assertRaises(ValueError):
+            solr_connection.insert_document("blah", doc)
+
+        # Test auto insertion past QUEUE_THRESHOLD
+        response_docs = []
+        for _ in range(solr_connection.QUEUE_THRESHOLD - 2):
+            response = solr_connection.insert_document("genericPage", doc)
+        response = solr_connection.insert_document("genericPage", doc)
+        response_docs += solr_connection.QUEUE_THRESHOLD * [doc]
+        self.assertEqual(response_docs, response)
+
+    @patch('pysolr.Solr')
+    @patch('pysolr.SolrCoreAdmin')
+    def test_insert_documents(self, admin_mock, solr_mock):
+        solr_connection = self.create_instance(admin_mock, solr_mock)
+        solr_connection.cores["genericPage"] = MockSolr()
+        doc = {"id": "testid"}
+
+        with self.assertRaises(ValueError):
+            solr_connection.insert_document("blah", [doc])
+
+        response = solr_connection.insert_documents("genericPage", [doc,doc])
+        self.assertEqual([doc,doc], response)
+
+    @patch('pysolr.Solr')
+    @patch('pysolr.SolrCoreAdmin')
+    def test_insert_queued(self, admin_mock, solr_mock):
+        solr_connection = self.create_instance(admin_mock, solr_mock)
+        solr_connection.cores["genericPage"] = MockSolr()
+        doc = {"id": "testid"}
+
+        solr_connection.insert_document("genericPage", doc)
+        solr_connection.insert_document("core1", doc)
+        response = solr_connection.insert_queued()
+        self.assertEqual({"genericPage":[doc],"core1":[doc]}, response)
 
     @patch('pysolr.Solr')
     @patch('pysolr.SolrCoreAdmin')
