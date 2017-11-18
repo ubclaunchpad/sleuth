@@ -6,13 +6,13 @@
 <tbody>
 <tr class=&#39;section1&#39;>
 
-<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=101">GRSJ 101</a></td>
+<td><a href="/cs/main;jsessionid=w5wKylv2Jz5DIbdOakm816jO?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=101">GRSJ 101</a></td>
 <td>Introduction to Social Justice</td></tr><tr class=&#39;section2&#39;>
 
-<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=102">GRSJ 102</a></td>
+<td><a href="/cs/main;jsessionid=w5wKylv2Jz5DIbdOakm816jO?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=102">GRSJ 102</a></td>
 <td>Global Issues in Social Justice</td></tr><tr class=&#39;section1&#39;>
 
-<td><a href="/cs/main?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=200">GRSJ 200</a></td>
+<td><a href="/cs/main;jsessionid=w5wKylv2Jz5DIbdOakm816jO?pname=subjarea&amp;tname=subjareas&amp;req=3&amp;dept=GRSJ&amp;course=200">GRSJ 200</a></td>
 <td>Gender and Environmental Justice</td></tr><tr class=&#39;section2&#39;>
 
 </tbody></table>

@@ -9,7 +9,7 @@ class SolrConnection(object):
 
     # The number of documents held in a core's insert queue before
     # the documents in the core are automatically inserted.
-    QUEUE_THRESHOLD = 50
+    QUEUE_THRESHOLD = 100
 
     def __init__(self, url):
         '''
