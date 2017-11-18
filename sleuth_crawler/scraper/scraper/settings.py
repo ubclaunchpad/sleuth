@@ -33,6 +33,9 @@ PARENT_URLS = [
 
 ### Custom Settings:
 
+# Process lower depth requests first
+DEPTH_PRIORITY = 50
+
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
