@@ -57,7 +57,7 @@ class SolrConnection(object):
 
         return response['schema']
 
-    def insert_document(self, core, doc):
+    def queue_document(self, core, doc):
         '''
         Queues a document for insertion into the specified core and returns None.
         If the number of documents in the queue exceeds a certain threshold,

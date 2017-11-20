@@ -3,7 +3,7 @@ import pysolr
 import json
 import requests
 from django.test import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 from sleuth_backend.solr.connection import SolrConnection
 from sleuth_backend.solr.models import GenericPage
 
@@ -41,7 +41,11 @@ class MockResponse(object):
 
 class TestSolrConnection(TestCase):
 
-    def create_instance(self, admin_mock, solr_mock):
+    @patch('pysolr.SolrCoreAdmin')
+    @patch('pysolr.Solr')
+    def setUp(self, fake_solr, fake_admin):
+        self.solr_mock = fake_solr
+        self.admin_mock = fake_admin
         status_response = {
             "status": {
                 "core1": "a core",
@@ -54,27 +58,19 @@ class TestSolrConnection(TestCase):
                 "url": url
             }
         }
-        solr_mock.return_value = MockSolr()
-        admin_mock.return_value = MockAdmin(status_response, get_url_response)
-        return SolrConnection(url)
+        self.admin_mock.return_value = MockAdmin(status_response, get_url_response)
+        self.solr_connection = SolrConnection(url)
 
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_fetch_core_names(self, admin_mock, solr_mock):
-        solr_connection = self.create_instance(admin_mock, solr_mock)
-
+    def test_fetch_core_names(self):
+        solr_connection = self.solr_connection
+        self.solr_mock.return_value = MockSolr
         self.assertEqual(["core1", "genericPage"], solr_connection.core_names())
         self.assertEqual(["core1", "genericPage"], solr_connection.fetch_core_names())
         self.assertEqual("http://a.test.url/solr", solr_connection.url)
 
-        for (_, value) in solr_connection.cores.items():
-            self.assertIsInstance(value, MockSolr)
-
     @patch('requests.get')
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_fetch_core_schema(self, admin_mock, solr_mock, get_mock):
-        solr_connection = self.create_instance(admin_mock, solr_mock)
+    def test_fetch_core_schema(self, get_mock):
+        solr_connection = self.solr_connection
         expected_response = {
             "schema" : {
                 "url": "http://a.test.url/solr/test/schema"
@@ -83,79 +79,74 @@ class TestSolrConnection(TestCase):
         get_mock.return_value = MockResponse(expected_response)
         self.assertEqual(expected_response["schema"], solr_connection.fetch_core_schema("test"))
 
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_insert_document(self, admin_mock, solr_mock):
-        solr_connection = self.create_instance(admin_mock, solr_mock)
-        solr_connection.cores["genericPage"] = MockSolr()
+    def test_queue_document(self):
+        solr_connection = self.solr_connection
+        solr_connection.cores["genericPage"] = self.solr_mock
         doc = {"id": "testid"}
-        response = solr_connection.insert_document("genericPage", doc)
+        response = solr_connection.queue_document("genericPage", doc)
         self.assertEqual(None, response)
 
         with self.assertRaises(ValueError):
-            solr_connection.insert_document("blah", doc)
+            solr_connection.queue_document("blah", doc)
 
         # Test auto insertion past QUEUE_THRESHOLD
         response_docs = []
         for _ in range(solr_connection.QUEUE_THRESHOLD - 2):
-            response = solr_connection.insert_document("genericPage", doc)
-        response = solr_connection.insert_document("genericPage", doc)
+            response = solr_connection.queue_document("genericPage", doc)
+        solr_connection.queue_document("genericPage", doc)
         response_docs += solr_connection.QUEUE_THRESHOLD * [doc]
-        self.assertEqual(response_docs, response)
+        self.assertEqual((response_docs,), self.solr_mock.add.call_args[0])
 
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_insert_documents(self, admin_mock, solr_mock):
-        solr_connection = self.create_instance(admin_mock, solr_mock)
-        solr_connection.cores["genericPage"] = MockSolr()
+    def test_insert_documents(self):
+        solr_connection = self.solr_connection
+        solr_connection.cores["genericPage"] = self.solr_mock
         doc = {"id": "testid"}
 
         with self.assertRaises(ValueError):
-            solr_connection.insert_document("blah", [doc])
+            solr_connection.queue_document("blah", [doc])
 
-        response = solr_connection.insert_documents("genericPage", [doc,doc])
-        self.assertEqual([doc,doc], response)
+        solr_connection.insert_documents("genericPage", [doc,doc])
+        self.assertEqual(([doc,doc],), self.solr_mock.add.call_args[0])
 
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_insert_queued(self, admin_mock, solr_mock):
-        solr_connection = self.create_instance(admin_mock, solr_mock)
-        solr_connection.cores["genericPage"] = MockSolr()
-        doc = {"id": "testid"}
+    def test_insert_queued(self):
+        solr_connection = self.solr_connection
+        solr_connection.cores['genericPage'] = self.solr_mock
+        solr_connection.cores['core1'] = self.solr_mock
+        doc1 = {'id': 'testid'}
+        doc2 = {'id': 'other_test_id'}
 
-        solr_connection.insert_document("genericPage", doc)
-        solr_connection.insert_document("core1", doc)
-        response = solr_connection.insert_queued()
-        self.assertEqual({"genericPage":[doc],"core1":[doc]}, response)
+        solr_connection.queue_document('genericPage', doc1)
+        solr_connection.queue_document('core1', doc2)
+        solr_connection.insert_queued()
+        self.assertEqual(2, self.solr_mock.add.call_count)
+        self.assertEqual(
+            [call([{'id': 'other_test_id'}]), call([{'id': 'testid'}])],
+            self.solr_mock.add.call_args_list
+        )
 
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_optimize(self, admin_mock, solr_mock):
+    def test_optimize(self):
         status_response = {
             "status": {
                 "c1": True,
                 "c2": True,
             }
         }
-        solr_mock.return_value = MockSolr()
-        admin_mock.return_value = MockAdmin(status_response=status_response)
-        solr_connection = SolrConnection("http://a.test.url/solr")
-        solr_connection.cores["generic_page"] = MagicMock()
-        solr_connection.cores["c1"] = MagicMock()
-        solr_connection.cores["c2"] = MagicMock()
+        self.admin_mock.return_value = MockAdmin(status_response=status_response)
+        self.solr_connection.cores["generic_page"] = MagicMock()
+        self.solr_connection.cores["c1"] = MagicMock()
+        self.solr_connection.cores["c2"] = MagicMock()
+        solr_connection = self.solr_connection
 
-        solr_connection.optimize("generic_page")
+        self.solr_connection.optimize("generic_page")
         self.assertTrue(solr_connection.cores["generic_page"].optimize.called)
 
-        solr_connection.optimize()
+        self.solr_connection.optimize()
         self.assertTrue(solr_connection.cores["generic_page"].optimize.called)
         self.assertTrue(solr_connection.cores["c1"].optimize.called)
         self.assertTrue(solr_connection.cores["c2"].optimize.called)
 
     @patch('requests.get')
-    @patch('pysolr.Solr')
-    @patch('pysolr.SolrCoreAdmin')
-    def test_query(self, admin_mock, solr_mock, get_mock):
+    def test_query(self, get_mock):
         response_content = {
             "response": {
                 "numFound": 1,
@@ -173,7 +164,7 @@ class TestSolrConnection(TestCase):
                 }
             }
         }
-        solr_connection = self.create_instance(admin_mock, solr_mock)
+        solr_connection = self.solr_connection
         get_mock.return_value = MockResponse(response_content)
 
         result = solr_connection.query('genericPage', 'test', sort="updatedAt desc",
