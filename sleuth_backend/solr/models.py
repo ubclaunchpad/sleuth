@@ -69,8 +69,26 @@ class CourseItem(SolrDocument):
         "updatedAt": "",
         "description": "",
         "subjectId": "",
-        "subjectData": []
+        "subjectData": [] # contains subject code [0] and name [1]
     }
 
     def __init__(self, **kwargs):
         super(CourseItem, self).__init__(self.doc, **kwargs)
+
+class RedditPost(SolrDocument):
+    '''
+    Represents a Reddit post
+    '''
+    doc = {
+        "id": "",
+        "type": "redditPost",
+        "name": "",
+        "updatedAt": "",
+        "description": "",
+        "comments": [],
+        "subreddit": "",
+        "links": [],
+    }
+
+    def __init__(self, **kwargs):
+        super(RedditPost, self).__init__(self.doc, **kwargs)

@@ -25,6 +25,7 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 PARENT_URLS = [
     'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0',
     'https://www.ubyssey.ca',
+    'https://reddit.com/r/ubc',
     'https://www.ubc.ca',
 ]
 

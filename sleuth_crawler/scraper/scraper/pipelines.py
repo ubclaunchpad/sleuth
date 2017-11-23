@@ -26,22 +26,24 @@ class SolrPipeline(object):
         self.solr_connection.optimize()
 
     def process_item(self, item, spider=None):
-        """
+        '''
         Match item type to predefined Schemas
         https://github.com/ubclaunchpad/sleuth/wiki/Schemas
-        """
+        '''
         if isinstance(item, ScrapyGenericPage):
             self.__process_generic_page(item)
-        if isinstance(item, ScrapyCourseItem):
+        elif isinstance(item, ScrapyCourseItem):
             self.__process_course_item(item)
+        elif isinstance(item, ScrapyRedditPost):
+            self.__process_reddit_post(item)
 
         return item
 
     def __process_generic_page(self, item):
-        """
+        '''
         Convert Scrapy item to Solr GenericPage and commit it to database
         Schema specified by sleuth_backend.solr.models.GenericPage
-        """
+        '''
         solr_doc = GenericPage(
             id=item["url"],
             type="genericPage",
@@ -55,10 +57,9 @@ class SolrPipeline(object):
         solr_doc.save_to_solr(self.solr_connection)
 
     def __process_course_item(self, item):
-        """
+        '''
         Convert Scrapy item to Solr CourseItem and commit it to database
-        Schema specified by sleuth_backend.solr.models.CourseItem
-        """
+        '''
         subject = item["subject"]
         subject_data = [subject["name"], subject["faculty"]]
         solr_doc = CourseItem(
@@ -69,6 +70,21 @@ class SolrPipeline(object):
             description=item["description"],
             subjectId=subject["url"],
             subjectData=subject_data
+        )
+        solr_doc.save_to_solr(self.solr_connection)
+
+    def __process_reddit_post(self, item):
+        '''
+        Convert Scrapy item to Solr ReddiPost and commit it to database
+        '''
+        solr_doc = RedditPost(
+            id=item['url'],
+            type='redditPost',
+            name=item['title'],
+            updatedAt=self.__make_date(),
+            description=item['post_content'],
+            comments=item['comments'],
+            links=item['links'],
         )
         solr_doc.save_to_solr(self.solr_connection)
 

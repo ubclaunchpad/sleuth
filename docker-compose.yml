@@ -13,7 +13,8 @@ services:
     entrypoint: [
       "/opt/docker-solr/scripts/start-solr.sh",
       "genericPage",
-      "courseItem"
+      "courseItem",
+      "redditPost",
     ]
 
   web:
