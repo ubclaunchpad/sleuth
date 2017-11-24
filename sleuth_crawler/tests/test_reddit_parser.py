@@ -24,7 +24,7 @@ class TestGenericPageParser(TestCase):
             item['title']
         )
         self.assertEqual(
-            "Don't worry, it feels like that for everyone. At some point, the UBC discord became it's own little circle-jerk of friends, exclusive to anyone else. There are about 8-10 regular users, who communicate mainly through inside jokes and 4chan-esque internet humor. You're better off without them, I guarantee.",
+            "Don't worry, it feels like that for everyone.At some point, the UBC discord became it's own little circle-jerk of friends, exclusive to anyone else. There are about 8-10 regular users, who communicate mainly through inside jokes and 4chan-esque internet humor. You're better off without them, I guarantee.",
             item['comments'][0]
         )
 
