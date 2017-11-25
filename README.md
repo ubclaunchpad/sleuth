@@ -63,10 +63,8 @@ $ bash scripts/populate.sh
 For live data, you can currently run the `BroadCrawler`, which scrapes a few thousand pages and pipelines them into the appropriate cores based on their type.
 
 ```Shell
-$ bash cd sleuth_crawler/scraper && scrapy crawl broad_crawler
+$ bash sleuth_crawler/run_crawlers.sh
 ```
-
-At the moment the crawler never really seems to stop, so you will likely have to force it to quit when you have sufficient data entries.
 
 To empty a core, go to:
 ```

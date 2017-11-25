@@ -42,7 +42,7 @@ def build_search_query(core, query_str, base_kwargs):
     '''
     kwargs = base_kwargs.copy()
 
-    if core == "genericPage":
+    if core == 'genericPage':
         fields = {
             'id': 1,
             'name': 8,
@@ -58,9 +58,9 @@ def build_search_query(core, query_str, base_kwargs):
             .for_fields(fields)
         query = query.select_or(terms_query)
         kwargs['default_field'] = 'content'
-        kwargs['highlight_fields'] = 'content'
+        kwargs['highlight_fields'] = 'content,description'
 
-    elif core == "courseItem":
+    elif core == 'courseItem':
         fields = {
             'id': 1,
             'name': 9,
@@ -74,6 +74,21 @@ def build_search_query(core, query_str, base_kwargs):
         query = query.select_or(terms_query)
         kwargs['default_field'] = 'name'
         kwargs['highlight_fields'] = 'description'
+
+    elif core == 'redditPost':
+        fields = {
+            'id': 1,
+            'name': 7,
+            'description': 10,
+            'comments': 6,
+        }
+        query = Query(query_str) \
+            .fuzz(1)
+        terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True) \
+            .for_fields(fields)
+        query = query.select_or(terms_query)
+        kwargs['default_field'] = 'name'
+        kwargs['highlight_fields'] = 'description,comments'
 
     else:
         query = Query(query_str)

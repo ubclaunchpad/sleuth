@@ -13,31 +13,6 @@ class TestBroadCralwer(TestCase):
     def setUp(self):
         self.spider = BroadCrawler()
 
-    def test_request_filtering(self):
-        '''
-        Test filtering normal requests
-        '''
-        # Direct non-matching requests to default parser (GenericPage)
-        req_in = scrapy.Request('https://www.ubc.ca')
-        req = self.spider.process_req(req_in)
-        self.assertTrue(req)
-        self.assertFalse(req.callback)
-
-    def test_request_filtering_course(self):
-        '''
-        Test filtering course requests
-        '''
-        # Redirect to parse_subjects if parent courses page
-        req_pass = scrapy.Request('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0')
-        req = self.spider.process_req(req_pass)
-        self.assertEqual(req.callback.__name__, course_parser.parse_subjects.__name__)
-        self.assertEqual(req.priority, 100)
-
-        # Discard request if children courses page
-        req_discard = scrapy.Request('https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=1&dept=ASTR')
-        req = self.spider.process_req(req_discard)
-        self.assertFalse(req)
-
     @patch('sleuth_crawler.scraper.scraper.spiders.parsers.generic_page_parser.parse_generic_item')
     def test_parse_generic_item(self, fake_parser):
         '''
