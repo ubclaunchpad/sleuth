@@ -1,0 +1,11 @@
+<title>The Ubyssey - UBC's official student newspaper</title>
+<link rel="canonical" href="https://www.ubyssey.ca/">
+<meta name="description" content="Weekly student newspaper of the University of British Columbia." />
+
+<!-- Open Graph data -->
+<meta property="og:title" content="OG The Ubyssey - UBC's official student newspaper" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.ubyssey.ca/" />
+<meta property="og:image" content="https://ubyssey.storage.googleapis.com/static/images/ubyssey-logo-square.png" />
+<meta property="og:description" content="OG Weekly student newspaper of the University of British Columbia." />
+<meta property="og:site_name" content="OG The Ubyssey" />

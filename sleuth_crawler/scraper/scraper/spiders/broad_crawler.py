@@ -11,8 +11,8 @@ class BroadCrawler(CrawlSpider):
     name = "broad_crawler"
 
     GENERIC_LINK_EXTRACTOR = LinkExtractor(
-        allow=(r'ubc', r'universityofbc', ),
-        deny=(r'accounts\.google', r'intent', )
+        allow=(r'ubc', r'universityofbc', r'ubyssey'),
+        deny=(r'accounts\.google', r'intent', r'lang=')
     )
 
     start_urls = PARENT_URLS
@@ -41,7 +41,7 @@ class BroadCrawler(CrawlSpider):
                 return req.replace(callback=course_parser.parse_subjects)
             else:
                 return
-        
+
         return req
         
     def parse_generic_item(self, response):

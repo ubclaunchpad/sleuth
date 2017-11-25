@@ -10,11 +10,12 @@ def strip_content(data):
         for script in soup(["script", "style"]):
             script.decompose()
         data = soup.get_text()
-        # strip extraneous line breaks and sort into list
+        # strip extraneous line breaks, discard very short lines,
+        # return the remaining lines as a list
         lines = []
         for line in data.splitlines():
             line = line.strip()
-            if line:
+            if line and len(line) > 5:
                 lines.append(line)
         return lines
     except Exception:

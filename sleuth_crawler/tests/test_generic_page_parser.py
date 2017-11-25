@@ -45,3 +45,13 @@ class TestGenericPageParser(TestCase):
         response = mock_response('<title>Engineering alumna gives back as a WiSE Mentor | Women in Science and Engineering</title>')
         item = ScrapyGenericPage(parser.parse_generic_item(response, []))
         self.assertEqual(item['site_title'], "Women in Science and Engineering")
+
+    def test_opengraph_metadata_use(self):
+        '''
+        Test how OpenGraph metadata is used
+        '''
+        response = mock_response('/test_data/metadata.txt', 'https://www.ubyssey.ca/')
+        item = ScrapyGenericPage(parser.parse_generic_item(response, []))
+        self.assertEqual(item['title'], "OG The Ubyssey - UBC's official student newspaper")
+        self.assertEqual(item['site_title'], 'OG The Ubyssey')
+        self.assertEqual(item['description'], 'OG Weekly student newspaper of the University of British Columbia.')

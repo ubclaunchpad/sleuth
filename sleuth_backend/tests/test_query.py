@@ -33,7 +33,8 @@ class TestQuery(TestCase):
             str(query)
         )
         not_dict = "not clean"
-        self.failUnlessRaises(ValueError, query.for_fields, not_dict)
+        with self.assertRaises(ValueError):
+            query.for_fields(not_dict)
 
     def test_boost_importance(self):
         """
@@ -80,7 +81,8 @@ class TestQuery(TestCase):
         '''
         query = Query("hello bruno").fuzz(2)
         self.assertEqual('"hello bruno"~2', str(query))
-        self.failUnlessRaises(ValueError, query.fuzz, 7)
+        with self.assertRaises(ValueError):
+            query.fuzz(7)
 
     def test_sanitation(self):
         '''

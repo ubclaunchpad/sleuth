@@ -3,9 +3,10 @@ from sleuth_backend.solr.models import SolrDocument, GenericPage, CourseItem
 from unittest.mock import MagicMock
 
 class TestModels(TestCase):
-    """
+    '''
     Test Solr document types
-    """
+    '''
+    
     def create_page(self, t):
         if t == "genericPage":
             args = {
@@ -43,6 +44,6 @@ class TestModels(TestCase):
     def test_save_to_solr(self):
         args, page = self.create_page("genericPage")
         mock = MagicMock()
-        mock.insert_document.return_value = None
+        mock.queue_document.return_value = None
         page.save_to_solr(mock)
-        mock.insert_document.assert_called_with("genericPage", args)
+        mock.queue_document.assert_called_with("genericPage", args)

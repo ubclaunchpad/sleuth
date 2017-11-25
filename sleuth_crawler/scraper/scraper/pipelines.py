@@ -17,10 +17,12 @@ class SolrPipeline(object):
         self.solr_connection = solr_connection
 
     def close_spider(self, spider=None):
-        """
+        '''
         Defragment Solr database after spider completes task
-        """
-        print("Scraper: Optimizing cores and closing spider")
+        '''
+        print("Closing scraper: Emptying all queued documents")
+        self.solr_connection.insert_queued()
+        print("Closing scraper: Optimizing all cores")
         self.solr_connection.optimize()
 
     def process_item(self, item, spider=None):
