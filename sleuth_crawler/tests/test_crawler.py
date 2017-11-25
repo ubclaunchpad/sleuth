@@ -64,3 +64,7 @@ class TestBroadCralwer(TestCase):
         self.assertTrue(fake_parser.called)
         links_arg = fake_parser.call_args[0][1]
         self.assertTrue(len(links_arg)>0)
+
+    def test_no_parse(self):
+        response = mock_response(file_name='/test_data/reddit_text_post.txt')
+        self.spider.no_parse(response)
