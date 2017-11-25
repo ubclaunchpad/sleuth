@@ -17,7 +17,6 @@ class TestSolrPipeline(TestCase):
         '''
         Test Generic Page processing
         '''
-        self.fake_solr.reset_mock()
         item = ScrapyGenericPage(
             url="http://www.ubc.ca",
             title="title",
@@ -36,7 +35,6 @@ class TestSolrPipeline(TestCase):
         self.assertEqual("description1 description2", doc["content"])
         self.assertTrue(len(doc["links"])==2)
         self.assertTrue(doc["updatedAt"])
-        print("Timestamp: " + doc["updatedAt"])
         self.assertEqual("title", doc["name"])
         self.assertEqual("site title", doc["siteName"])
 
@@ -44,7 +42,6 @@ class TestSolrPipeline(TestCase):
         '''
         Test Course Item processing
         '''
-        self.fake_solr.reset_mock()
         item = ScrapyCourseItem(
             subject={"url":"some.url","name":"somename","faculty":"somefaculty"},
             url="subject.url",
@@ -58,6 +55,21 @@ class TestSolrPipeline(TestCase):
         self.assertEqual("courseItem", doc_type)
         self.assertEqual("subject.url", doc["id"])
 
+    def test_process_reddit_post(self):
+        '''
+        Test Reddit Post processing
+        '''
+        item = ScrapyRedditPost(
+            url='reddit.com/r/ubc', title='', subreddit='', post_content='',
+            comments=['wow!'], links=[]
+        )
+        self.pipeline.process_item(item)
+        args = self.__assert_and_return_args()
+        doc_type = args[0]
+        doc = args[1]
+        self.assertEqual('redditPost', doc_type)
+        self.assertEqual('wow!', doc['comments'][0])
+
     def test_close_spider(self):
         '''
         Test that closing spider calls solrConnection.optimize()
@@ -66,6 +78,8 @@ class TestSolrPipeline(TestCase):
         self.assertTrue(self.fake_solr.optimize.called)
 
     def __assert_and_return_args(self):
+        # Utility function for determining that queue_document
+        # was called with two parameters and returning the arguments
         args = self.fake_solr.queue_document.call_args[0]
         self.assertTrue(args[0])
         self.assertTrue(args[1])

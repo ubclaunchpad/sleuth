@@ -23,10 +23,15 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 # List approved starting URLs to be crawled by BroadCrawler
 # Place specific domains before www.ubc.ca
 PARENT_URLS = [
-    'https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0',
     'https://www.ubyssey.ca',
+    'https://reddit.com/r/ubc',
     'https://www.ubc.ca',
 ]
+
+# Specific starting URLs to be crawled by a CustomCrawler
+CUSTOM_URLS = {
+    'courseItem': ['https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=0'],
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'courses_scraper (+http://www.yourdomain.com)'
@@ -37,7 +42,7 @@ PARENT_URLS = [
 DEPTH_PRIORITY = 50
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Enable SSL Handshakes
 DOWNLOADER_CLIENTCONTEXTFACTORY = 'scraper.customcontext.CustomContextFactory'
