@@ -28,7 +28,8 @@ class TestModels(TestCase):
                 "updatedAt": "1234",
                 "description": "testdescription",
                 "subjectId": "test",
-                "subjectData": []
+                "subjectName": "ubc",
+                "faculty": "engineering"
             }
             return (args, CourseItem(**args))
 

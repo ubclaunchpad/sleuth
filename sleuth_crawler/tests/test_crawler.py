@@ -13,6 +13,35 @@ class TestBroadCralwer(TestCase):
     def setUp(self):
         self.spider = BroadCrawler()
 
+    @patch('sleuth_crawler.scraper.scraper.spiders.parsers.reddit_parser.parse_post')
+    @patch('sleuth_crawler.scraper.scraper.spiders.parsers.generic_page_parser.parse_generic_item')
+    def test_parse_start(self, fake_generic_parser, fake_reddit_parser):
+        '''
+        Test how crawler parses starting urls
+        '''
+        response = mock_response(url='https://www.ubc.ca')
+        self.spider.parse_start_urls(response)
+        self.assertTrue(fake_generic_parser.called)
+        response = mock_response(url='https://www.reddit.com')
+        self.spider.parse_start_urls(response)
+        self.assertTrue(fake_reddit_parser.called)
+
+    def test_process_request(self):
+        '''
+        Test how crawler assigns different callbacks to requests
+        '''
+        req_in = scrapy.Request(url='https://www.reddit.com')
+        req = self.spider.process_request(req_in)
+        self.assertEqual(req.callback, 'no_parse')
+
+        req_in = scrapy.Request(url='https://www.reddit.com/r/ubc/comments/123')
+        req = self.spider.process_request(req_in)
+        self.assertEqual(req.callback, 'parse_reddit_post')
+
+        req_in = scrapy.Request(url='https://www.bruno.com')
+        req = self.spider.process_request(req_in)
+        self.assertEqual(req.callback, 'parse_generic_item')
+
     @patch('sleuth_crawler.scraper.scraper.spiders.parsers.generic_page_parser.parse_generic_item')
     def test_parse_generic_item(self, fake_parser):
         '''

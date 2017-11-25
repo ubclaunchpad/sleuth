@@ -69,7 +69,8 @@ class CourseItem(SolrDocument):
         "updatedAt": "",
         "description": "",
         "subjectId": "",
-        "subjectData": [] # contains subject code [0] and name [1]
+        "subjectName": "",
+        "faculty": "",
     }
 
     def __init__(self, **kwargs):

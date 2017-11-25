@@ -61,7 +61,7 @@ class TestAPI(TestCase):
     @patch('sleuth_backend.solr.connection.SolrConnection.core_names')
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_apis_with_valid_request(self, mock_query, mock_cores):
-        # search
+        # genericPage search
         mock_query.return_value = {
             "type": "genericPage",
             "response": {
@@ -113,6 +113,15 @@ class TestAPI(TestCase):
             {'data': [{'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [{'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}, {'type': 'courseItem', 'response': {'numFound': 1, 'start': 0, 'docs': [
             {'id': 'www.cool.com', 'description': 'Nice one dude', 'updatedAt': '', 'name': '', 'content': ''}]}, 'highlighting': {'www.cool.com': {'content': ['Nice one dude']}}}], 'request': {'query': 'somequery', 'types': ['courseItem', 'courseItem'], 'return_fields': ['id', 'updatedAt', 'name', 'description'], 'state': ''}}
         )
+
+        # redditPost search
+        mock_query.return_value['type'] = 'redditPost'
+        mock_query.return_value['highlighting']['www.cool.com'] = {'content': ['Nice']}
+        params = { 'q': 'somequery', 'type': 'redditPost' }
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 200)
+        mock_response = mock_query.return_value
         
         # getdocument
         params = {

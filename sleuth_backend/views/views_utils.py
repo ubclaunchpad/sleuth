@@ -67,8 +67,7 @@ def build_search_query(core, query_str, base_kwargs):
             'description': 8,
             'subjectData': 5,
         }
-        query = Query(query_str) \
-            .fuzz(2)
+        query = Query(query_str).fuzz(2)
         terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True) \
             .for_fields(fields)
         query = query.select_or(terms_query)
@@ -82,8 +81,7 @@ def build_search_query(core, query_str, base_kwargs):
             'description': 10,
             'comments': 6,
         }
-        query = Query(query_str) \
-            .fuzz(1)
+        query = Query(query_str).fuzz(1)
         terms_query = Query(query_str, as_phrase=False, escape=True, sanitize=True) \
             .for_fields(fields)
         query = query.select_or(terms_query)

@@ -60,16 +60,16 @@ class SolrPipeline(object):
         '''
         Convert Scrapy item to Solr CourseItem and commit it to database
         '''
-        subject = item["subject"]
-        subject_data = [subject["name"], subject["faculty"]]
+        subject = item['subject']
         solr_doc = CourseItem(
-            id=item["url"],
-            type="courseItem",
-            name=item["name"],
+            id=item['url'],
+            type='courseItem',
+            name=item['name'],
             updatedAt=self.__make_date(),
-            description=item["description"],
-            subjectId=subject["url"],
-            subjectData=subject_data
+            description=item['description'],
+            subjectId=subject['url'],
+            subjectName=subject['name'],
+            faculty=subject['faculty']
         )
         solr_doc.save_to_solr(self.solr_connection)
 
