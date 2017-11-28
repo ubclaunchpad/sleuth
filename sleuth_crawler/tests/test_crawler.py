@@ -32,15 +32,17 @@ class TestBroadCralwer(TestCase):
         '''
         req_in = scrapy.Request(url='https://www.reddit.com')
         req = self.spider.process_request(req_in)
-        self.assertEqual(req.callback, 'no_parse')
+        self.assertEqual(req.callback.__name__, 'no_parse')
 
         req_in = scrapy.Request(url='https://www.reddit.com/r/ubc/comments/123')
         req = self.spider.process_request(req_in)
-        self.assertEqual(req.callback, 'parse_reddit_post')
+        self.assertEqual(req.callback.__name__, 'parse_reddit_post')
 
+        # process_request should not try to reassign callback on
+        # a normal website for generic_page_parser
         req_in = scrapy.Request(url='https://www.bruno.com')
         req = self.spider.process_request(req_in)
-        self.assertEqual(req.callback, 'parse_generic_item')
+        self.assertEqual(req.callback, None)
 
     @patch('sleuth_crawler.scraper.scraper.spiders.parsers.generic_page_parser.parse_generic_item')
     def test_parse_generic_item(self, fake_parser):
