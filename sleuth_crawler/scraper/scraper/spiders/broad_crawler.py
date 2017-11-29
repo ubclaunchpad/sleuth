@@ -40,11 +40,9 @@ class BroadCrawler(CrawlSpider):
         if 'reddit.com' in req.url:
             req = req.replace(priority=100)
             if 'comments' in req.url:
-                req = req.replace(callback='parse_reddit_post')
+                req = req.replace(callback=self.parse_reddit_post)
             else:
-                req = req.replace(callback='no_parse')
-        else:
-            req = req.replace(callback='parse_generic_item')
+                req = req.replace(callback=self.no_parse)
 
         return req
 
