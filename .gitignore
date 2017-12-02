@@ -72,3 +72,5 @@ venv.bak/
 
 # nltk
 averaged_perceptron_tagger/
+
+*.DS_Store

@@ -93,3 +93,14 @@ class RedditPost(SolrDocument):
 
     def __init__(self, **kwargs):
         super(RedditPost, self).__init__(self.doc, **kwargs)
+
+models = [SolrDocument, GenericPage, CourseItem, RedditPost]
+
+def get_models_fields():
+    '''
+    Return a list of the doc description of each model type
+    '''
+    fields = []
+    for d in [m.doc for m in models]:
+        fields += [k for k, _ in d.items() if k not in fields]
+    return fields
