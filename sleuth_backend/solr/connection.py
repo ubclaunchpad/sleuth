@@ -83,7 +83,7 @@ class SolrConnection(object):
         '''
         if core_name not in self.cores:
             raise ValueError('No Solr core with the name "{}" was found'.format(core_name))
-        print('Inserting '+str(len(docs))+' items into core '+core_name)
+        print('Inserting {} items into core {}'.format(str(len(docs)), core_name))
         return self.cores[core_name].add(docs)
 
     def insert_queued(self):
@@ -158,8 +158,7 @@ class SolrConnection(object):
                 raise ValueError('No Solr core with the name "{}" was found'.format(core_name))
             self.cores[core_name].optimize()
         else:
-            for core in self.cores:
-                self.cores[core].optimize()
+            [self.cores[core].optimize() for core in self.cores]
 
     def _get_url(self, url, params):
         '''

@@ -21,22 +21,29 @@ def build_return_fields(fields):
         return_fields = return_fields + ',' + fields
     return return_fields
 
-def flatten_doc(doc, return_fields):
+def flatten_doc(doc, return_fields, exceptions=None):
     '''
-    Flattens single-item list fields returned by Solr
+    @param doc a dictionary containing the contents of a document
+    @param return_fields a string of comma-separated field names
+    @param exceptions an array of names of fields that shouldn't be flattened
+
+    Flattens single-item list fields in genericPage returned by Solr ignoring
+    any fields that appear in the given list of exceptions.
     '''
     for f in return_fields.split(","):
-        if f in doc:
-            doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
-        else:
+        if exceptions is not None and f in exceptions:
+            continue
+        elif f not in doc:
             doc[f] = ''
+        else:
+            doc[f] = doc[f][0] if len(doc[f]) == 1 else doc[f]
     return doc
 
 def build_search_query(core, query_str, base_kwargs):
     '''
     Builds a search query and sets parameters that is most likely to
     return the best results for the given core using the given user query.
-    
+
     See https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
     for more information about Apache Lucene query syntax.
     '''

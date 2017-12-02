@@ -11,7 +11,6 @@ from sleuth_backend.solr import connection as solr
 from sleuth.settings import HAYSTACK_CONNECTIONS
 
 SOLR = solr.SolrConnection(HAYSTACK_CONNECTIONS['default']['URL'])
-DEFAULT_CORE = "test"
 
 def cores(request):
     '''
@@ -42,7 +41,7 @@ def search(request):
     Example Usage:
     http:// ... /api/search/?q=hello&core=genericPage&return=children
 
-    Example Response Body: 
+    Example Response Body:
     {
         "data": [
             {
@@ -115,11 +114,11 @@ def search(request):
                     message=query_response['error']['msg']+" on core "+core_to_search
                 )
                 return HttpResponse(sleuth_error.json(), status=query_response['error']['code'])
-            
-            # Attach type to response and flatten single-item list fields
+
+            # Attach type to response and flatten single-item list fields (except for links)
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
-                flatten_doc(doc, return_fields)
+                flatten_doc(doc, return_fields, ['links'])
 
             responses['data'].append(query_response)
 
