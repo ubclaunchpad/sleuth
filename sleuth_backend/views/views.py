@@ -80,10 +80,15 @@ def search(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+    try:
+        cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+        return_fields = utils.build_return_fields(request.GET.get('return', ''))
+    except ValueError as err:
+        sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST, str(err))
+        return HttpResponse(sleuth_error.json(), status=400)
+
     query = request.GET.get('q', '')
     state = request.GET.get('state', '')
-    return_fields = utils.build_return_fields(request.GET.get('return', ''))
 
     kwargs = {
         'sort': request.GET.get('sort', ''),
@@ -156,10 +161,15 @@ def getdocument(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+    try:
+        cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+        return_fields = utils.build_return_fields(request.GET.get('return', ''))
+    except ValueError as err:
+        sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST, str(err))
+        return HttpResponse(sleuth_error.json(), status=400)
+
     doc_id = request.GET.get('id', '')
     state = request.GET.get('state', '')
-    return_fields = utils.build_return_fields(request.GET.get('return', ''))
 
     kwargs = { 'return_fields': return_fields }
 

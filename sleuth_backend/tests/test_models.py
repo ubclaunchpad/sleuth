@@ -52,6 +52,6 @@ class TestModels(TestCase):
     def test_get_models_fields(self):
         result = get_models_fields()
         self.assertEquals(
-            ['id', 'type', 'name', 'updatedAt', 'description', 'siteName', 'content', 'links', 'subjectId', 'subjectName', 'faculty', 'comments', 'subreddit'],
+            ['id', 'type', 'name', 'updatedAt', 'siteName', 'description', 'content', 'links', 'subjectId', 'subjectName', 'faculty', 'comments', 'subreddit'],
             result
         )

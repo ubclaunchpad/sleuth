@@ -10,25 +10,36 @@ import sleuth_backend.solr.models as models
 def build_core_request(core, solr_cores):
     '''
     Builds a list of cores to search based on given core parameter
-    Also checks requested cores against available cores and discards
-    invalid requested cores
+    Also checks requested cores against available cores and raises
+    an exception if core is invalid
     '''
+    if core is '':
+        return solr_cores
+
     core_params = [s for s in core.split(',')]
-    core_params = [c for c in core_params if c in solr_cores]
-    return solr_cores if len(core_params) is 0 else core_params
+    bad_core_params = [c for c in core_params if c not in solr_cores]
+    if len(bad_core_params) > 0:
+        raise ValueError('Invalid type(s) requested: ' + ','.join(bad_core_params))
+
+    return core_params
 
 def build_return_fields(fields):
     '''
     Builds a string listing the fields to return
     Also checks requested return fields against available return fields
-    and discards invalid return fields
+    and raises an exception if cores is invalid
     '''
     return_fields = 'id,updatedAt,name,description'
+    if fields is '':
+        return return_fields
+
     fields_list = [s for s in fields.split(',')]
-    fields_list = [f for f in fields_list if f in models.get_models_fields()]
-    if len(fields_list) > 0:
-        return_fields = return_fields + ',' + ",".join(fields_list)
-    return return_fields
+    valid_fields = models.get_models_fields()
+    bad_fields = [f for f in fields_list if f not in valid_fields]
+    if len(bad_fields) > 0:
+        raise ValueError('Invalid return return field(s) requested: ' + ','.join(bad_fields))
+
+    return return_fields + ',' + ','.join(fields_list)
 
 def flatten_doc(doc, return_fields):
     '''
