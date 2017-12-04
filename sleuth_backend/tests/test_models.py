@@ -1,5 +1,5 @@
 from django.test import TestCase
-from sleuth_backend.solr.models import SolrDocument, GenericPage, CourseItem
+from sleuth_backend.solr.models import SolrDocument, GenericPage, CourseItem, get_models_fields
 from unittest.mock import MagicMock
 
 class TestModels(TestCase):
@@ -48,3 +48,10 @@ class TestModels(TestCase):
         mock.queue_document.return_value = None
         page.save_to_solr(mock)
         mock.queue_document.assert_called_with("genericPage", args)
+
+    def test_get_models_fields(self):
+        result = get_models_fields()
+        self.assertEquals(
+            ['id', 'type', 'name', 'updatedAt', 'siteName', 'description', 'content', 'links', 'subjectId', 'subjectName', 'faculty', 'comments', 'subreddit'],
+            result
+        )

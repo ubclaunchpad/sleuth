@@ -5,8 +5,8 @@ Sleuth's Django API handlers
 import pysolr
 import json
 from django.http import HttpResponse, JsonResponse
+import sleuth_backend.views.views_utils as utils
 from .error import SleuthError, ErrorTypes
-from .views_utils import *
 from sleuth_backend.solr import connection as solr
 from sleuth.settings import HAYSTACK_CONNECTIONS
 
@@ -80,10 +80,15 @@ def search(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    cores_to_search = build_core_request(request.GET.get('type', ''), SOLR.core_names())
+    try:
+        cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+        return_fields = utils.build_return_fields(request.GET.get('return', ''))
+    except ValueError as err:
+        sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST, str(err))
+        return HttpResponse(sleuth_error.json(), status=400)
+
     query = request.GET.get('q', '')
     state = request.GET.get('state', '')
-    return_fields = build_return_fields(request.GET.get('return', ''))
 
     kwargs = {
         'sort': request.GET.get('sort', ''),
@@ -107,7 +112,7 @@ def search(request):
     }
     for core_to_search in cores_to_search:
         try:
-            new_query, new_kwargs = build_search_query(core_to_search, query, kwargs)
+            new_query, new_kwargs = utils.build_search_query(core_to_search, query, kwargs)
             query_response = SOLR.query(core_to_search, new_query, **new_kwargs)
             if 'error' in query_response:
                 sleuth_error = SleuthError(
@@ -119,13 +124,13 @@ def search(request):
             # Attach type to response and flatten single-item list fields
             query_response['type'] = core_to_search
             for doc in query_response['response']['docs']:
-                flatten_doc(doc, return_fields)
+                utils.flatten_doc(doc, return_fields)
 
             responses['data'].append(query_response)
 
         # Handle errors and exceptions from each query
         except (Exception, pysolr.SolrError) as e:
-            message, status = build_error(e)
+            message, status = utils.build_error(e)
             return HttpResponse(message, status=status)
 
     return JsonResponse(responses)
@@ -156,10 +161,15 @@ def getdocument(request):
     if request.method != 'GET':
         return HttpResponse(status=405)
 
-    cores_to_search = build_core_request(request.GET.get('type', ''), SOLR.core_names())
+    try:
+        cores_to_search = utils.build_core_request(request.GET.get('type', ''), SOLR.core_names())
+        return_fields = utils.build_return_fields(request.GET.get('return', ''))
+    except ValueError as err:
+        sleuth_error = SleuthError(ErrorTypes.INVALID_SEARCH_REQUEST, str(err))
+        return HttpResponse(sleuth_error.json(), status=400)
+
     doc_id = request.GET.get('id', '')
     state = request.GET.get('state', '')
-    return_fields = build_return_fields(request.GET.get('return', ''))
 
     kwargs = { 'return_fields': return_fields }
 
@@ -178,7 +188,7 @@ def getdocument(request):
     }
     for core_to_search in cores_to_search:
         try:
-            new_query, new_kwargs = build_getdocument_query(doc_id, kwargs)
+            new_query, new_kwargs = utils.build_getdocument_query(doc_id, kwargs)
             query_response = SOLR.query(core_to_search, new_query, **new_kwargs)
             if 'error' in query_response:
                 sleuth_error = SleuthError(
@@ -190,13 +200,13 @@ def getdocument(request):
                 # Return result if a value is found
                 response['data'] = {
                     'type': core_to_search,
-                    'doc': flatten_doc(query_response['response']['docs'][0], return_fields)
+                    'doc': utils.flatten_doc(query_response['response']['docs'][0], return_fields)
                 }
                 return JsonResponse(response)
 
         # Handle errors and exceptions from each query
         except (Exception, pysolr.SolrError) as e:
-            message, status = build_error(e)
+            message, status = utils.build_error(e)
             return HttpResponse(message, status=status)
 
     return HttpResponse("Document not found", status=404)
