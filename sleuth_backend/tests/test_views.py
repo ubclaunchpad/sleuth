@@ -61,6 +61,8 @@ class TestAPI(TestCase):
     @patch('sleuth_backend.solr.connection.SolrConnection.core_names')
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
     def test_apis_with_valid_request(self, mock_query, mock_cores):
+        mock_cores.return_value = ['genericPage', 'redditPost', 'courseItem']
+
         # genericPage search
         mock_query.return_value = {
             "type": "genericPage",
@@ -93,6 +95,7 @@ class TestAPI(TestCase):
         mock_response['response']['docs'][0]['updatedAt'] = ''
         mock_response['response']['docs'][0]['name'] = ''
         mock_response['response']['docs'][0]['description'] = 'Nice one dude'
+        self.maxDiff = None
         self.assertEqual(
             json.loads(result.content.decode('utf-8')),
             {
@@ -115,6 +118,7 @@ class TestAPI(TestCase):
         )
 
         # redditPost search
+        mock_cores.return_value = ['genericPage', 'redditPost', 'courseItem']
         mock_query.return_value['type'] = 'redditPost'
         mock_query.return_value['highlighting']['www.cool.com'] = {'content': ['Nice']}
         params = { 'q': 'somequery', 'type': 'redditPost' }
@@ -123,7 +127,7 @@ class TestAPI(TestCase):
         self.assertEqual(result.status_code, 200)
         mock_response = mock_query.return_value
         
-        # getdocument
+        # getdocument       
         params = {
             'id': 'somequery',
             'type': 'genericPage',
@@ -143,8 +147,11 @@ class TestAPI(TestCase):
         result = getdocument(mock_request)
         self.assertEqual(result.status_code, 404)
 
+    @patch('sleuth_backend.solr.connection.SolrConnection.core_names')
     @patch('sleuth_backend.solr.connection.SolrConnection.query')
-    def test_apis_with_error_response(self, mock_query):
+    def test_apis_with_error_response(self, mock_query, mock_cores):
+        mock_cores.return_value = ['test']        
+
         # Solr response error
         mock_query.return_value = {
             "error": {
@@ -195,3 +202,15 @@ class TestAPI(TestCase):
         mock_request = MockRequest('GET', get=MockGet({'id':'query'}))
         result = getdocument(mock_request)
         self.assertEqual(result.status_code, 500)
+
+        # Invalid param error
+        params = {
+            'q': 'somequery',
+            'type': 'asdlialisfas',
+        }
+        mock_request = MockRequest('GET', get=MockGet(params))
+        result = search(mock_request)
+        self.assertEqual(result.status_code, 400)
+        mock_request = MockRequest('GET', get=MockGet({'id':'query','type':'asdf'}))
+        result = getdocument(mock_request)
+        self.assertEqual(result.status_code, 400)
